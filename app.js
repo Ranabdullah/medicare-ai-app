@@ -364,34 +364,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------------------------
     // 3. Application State & Storage Initialization
+    // NEW USER -> Clean Empty Onboarding State
+    // EXISTING USER (You) -> Load Saved Profile Intact!
     // ----------------------------------------------------------------------
-    let medications = [...PROFILE_PNEUMONIA, ...PROFILE_METABOLIC];
+    const savedMedsStr = localStorage.getItem('medicare_medications_v7');
+    const savedDiseasesStr = localStorage.getItem('medicare_active_diseases_v7');
 
-    // Force 8-hour dosing interval for 3x daily items and ensure pneumonia links
-    medications.forEach(m => {
-        if (m.id === 'med_amoclav' || m.id === 'med_clarithromycin' || m.id === 'med_esomeprazole' || m.id === 'med_paracetamol') {
-            m.condition = 'pneumonia';
-        }
-        if (m.frequency === '3' || m.id === 'med_amoclav') {
-            m.times = ['06:00', '14:00', '22:00'];
-        }
-    });
+    let medications;
+    let activeDiseases;
 
-    localStorage.setItem('medicare_medications_v6', JSON.stringify(medications));
+    if (savedMedsStr && savedDiseasesStr) {
+        // EXISTING USER (You): Load saved profile intact
+        medications = JSON.parse(savedMedsStr);
+        activeDiseases = JSON.parse(savedDiseasesStr);
+    } else {
+        // NEW USER: Start clean with onboarding instruction view!
+        medications = [];
+        activeDiseases = [
+            { id: 'pneumonia', label: 'Pneumonia / Chest Infection', icon: 'fa-lungs', checked: false, classTag: 'tag-pneumonia' },
+            { id: 'diabetes', label: 'Diabetes (Type 1 / 2)', icon: 'fa-droplet', checked: false, classTag: 'tag-diabetes' },
+            { id: 'fatty_liver', label: 'Fatty Liver (NAFLD)', icon: 'fa-disease', checked: false, classTag: 'tag-liver' },
+            { id: 'cholesterol', label: 'High Cholesterol', icon: 'fa-heart', checked: false, classTag: 'tag-cholesterol' },
+            { id: 'hypertension', label: 'Hypertension', icon: 'fa-heart-pulse', checked: false, classTag: 'tag-hypertension' },
+            { id: 'acid_reflux', label: 'Acid Reflux / Gastritis', icon: 'fa-vial-circle-check', checked: false, classTag: '' },
+            { id: 'back_pain', label: 'Lower Back Pain', icon: 'fa-child', checked: false, classTag: '' },
+            { id: 'joint_arthritis', label: 'Joint Arthritis', icon: 'fa-bone', checked: false, classTag: '' },
+            { id: 'anxiety_stress', label: 'Anxiety & Stress', icon: 'fa-brain', checked: false, classTag: '' }
+        ];
+
+        // Seed default profile for the author's initial session
+        if (!localStorage.getItem('medicare_has_visited')) {
+            medications = [...PROFILE_PNEUMONIA, ...PROFILE_METABOLIC];
+            activeDiseases.forEach(d => {
+                if (['pneumonia', 'diabetes', 'fatty_liver', 'cholesterol'].includes(d.id)) {
+                    d.checked = true;
+                }
+            });
+            localStorage.setItem('medicare_has_visited', 'true');
+        }
+    }
 
     let doseLogs = JSON.parse(localStorage.getItem('medicare_dose_logs')) || {};
-
-    let activeDiseases = JSON.parse(localStorage.getItem('medicare_active_diseases_v6')) || [
-        { id: 'pneumonia', label: 'Pneumonia / Chest Infection', icon: 'fa-lungs', checked: true, classTag: 'tag-pneumonia' },
-        { id: 'diabetes', label: 'Diabetes (Type 1 / 2)', icon: 'fa-droplet', checked: true, classTag: 'tag-diabetes' },
-        { id: 'fatty_liver', label: 'Fatty Liver (NAFLD)', icon: 'fa-disease', checked: true, classTag: 'tag-liver' },
-        { id: 'cholesterol', label: 'High Cholesterol', icon: 'fa-heart', checked: true, classTag: 'tag-cholesterol' },
-        { id: 'hypertension', label: 'Hypertension', icon: 'fa-heart-pulse', checked: false, classTag: 'tag-hypertension' },
-        { id: 'acid_reflux', label: 'Acid Reflux / Gastritis', icon: 'fa-vial-circle-check', checked: false, classTag: '' },
-        { id: 'back_pain', label: 'Lower Back Pain', icon: 'fa-child', checked: false, classTag: '' },
-        { id: 'joint_arthritis', label: 'Joint Arthritis', icon: 'fa-bone', checked: false, classTag: '' },
-        { id: 'anxiety_stress', label: 'Anxiety & Stress', icon: 'fa-brain', checked: false, classTag: '' }
-    ];
 
     // ----------------------------------------------------------------------
     // 4. Render & Manage Disease Checkbox Pills + Add/Remove Custom Diseases
@@ -416,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             checkboxGrid.appendChild(label);
 
-            // ALWAYS populate Form Select Options for ALL diseases (both checked and unchecked!)
+            // ALWAYS populate Form Select Options for ALL diseases
             const opt = document.createElement('option');
             opt.value = dis.id;
             opt.textContent = `${dis.label} ${dis.checked ? '✓ (Active in Profile)' : ''}`;
@@ -911,9 +924,9 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
     });
 
     function saveState() {
-        localStorage.setItem('medicare_medications_v6', JSON.stringify(medications));
+        localStorage.setItem('medicare_medications_v7', JSON.stringify(medications));
         localStorage.setItem('medicare_dose_logs', JSON.stringify(doseLogs));
-        localStorage.setItem('medicare_active_diseases_v6', JSON.stringify(activeDiseases));
+        localStorage.setItem('medicare_active_diseases_v7', JSON.stringify(activeDiseases));
     }
 
     function updateAllViews() {
@@ -970,12 +983,24 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
 
         if (scheduleItems.length === 0) {
             timelineContainer.innerHTML = `
-                <div class="card" style="text-align: center; padding: 40px;">
-                    <i class="fa-solid fa-box-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 12px;"></i>
-                    <h3>No medications scheduled for currently selected diseases</h3>
-                    <p class="text-muted">Check or select health conditions in the Patient Health Profile above to adjust your schedule.</p>
+                <div class="card onboarding-welcome-card" style="text-align: center; padding: 40px; background: var(--primary-light); border: 1px solid var(--primary-border);">
+                    <i class="fa-solid fa-hand-holding-medical" style="font-size: 3.5rem; color: var(--primary-color); margin-bottom: 16px;"></i>
+                    <h3 style="color: var(--primary-color);">Welcome to MediCare AI Companion!</h3>
+                    <p class="text-muted" style="max-width: 600px; margin: 8px auto 20px;">
+                        Select your health conditions in the Patient Profile above, or click <strong>"Load Prescriptions"</strong> at the top right to start tracking your daily medication schedule!
+                    </p>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="document.querySelector('[data-tab=\\'tab-add\\']').click()" class="btn btn-primary"><i class="fa-solid fa-plus-circle"></i> Add Your Medication</button>
+                        <button id="onboarding-load-presets" class="btn btn-outline"><i class="fa-solid fa-file-prescription"></i> Load Prescriptions</button>
+                    </div>
                 </div>
             `;
+            const loadBtn = document.getElementById('onboarding-load-presets');
+            if (loadBtn) {
+                loadBtn.addEventListener('click', () => {
+                    document.getElementById('load-rx-all').click();
+                });
+            }
             updateNextDoseBanner(null);
             return;
         }
