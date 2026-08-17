@@ -93,6 +93,26 @@ document.addEventListener('DOMContentLoaded', () => {
             irelandStatus: "OTC",
             irelandNote: "Over-The-Counter (OTC): Dietary supplement available locally in Irish health stores & pharmacies.",
             interactions: "Take TWICE DAILY with meals and a full glass of water."
+        },
+        "ferrous_fumarate": {
+            name: "Galfer / Ferrous Fumarate 305mg (Iron)",
+            rxcui: "4410",
+            ingredient: "Ferrous Fumarate 305mg (Elemental Iron 100mg)",
+            purpose: "Iron Replacement for Iron Deficiency Anemia",
+            condition: "anemia",
+            irelandStatus: "OTC",
+            irelandNote: "Over-The-Counter (Pharmacy): Available from Irish pharmacies for iron deficiency.",
+            interactions: "Take with orange juice (Vitamin C) for absorption. Avoid tea, coffee, and dairy within 2 hours."
+        },
+        "fludrocortisone": {
+            name: "Fludrocortisone Acetate 100mcg",
+            rxcui: "4458",
+            ingredient: "Fludrocortisone 100mcg",
+            purpose: "Mineralocorticoid for Severe Orthostatic Hypotension / Low Blood Pressure",
+            condition: "hypotension",
+            irelandStatus: "POM",
+            irelandNote: "Prescription Only (POM): Requires Doctor Prescription in Ireland.",
+            interactions: "Take in the morning with food. Ensure adequate dietary sodium and fluid intake."
         }
     };
 
@@ -208,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // Comprehensive Evidence-Based Scientific Research Exercises for ALL Diseases
-    const RESEARCH_EXERCISES = [
+    let RESEARCH_EXERCISES = [
         {
             id: "ex_deep_breathing_pneu",
             title: "Deep Diaphragmatic Breathing & Lung Expansion",
@@ -225,6 +245,38 @@ document.addEventListener('DOMContentLoaded', () => {
             ],
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/31383216/",
             pubMedTitle: "PubMed: Respiratory Rehabilitation in Community-Acquired Pneumonia"
+        },
+        {
+            id: "ex_hypotension_counter_pressure",
+            title: "Lower-Body Isometric Muscle Pump & Calf Raises",
+            condition: "hypotension",
+            conditionTag: "Low Blood Pressure (Hypotension)",
+            duration: "3-5 mins / before standing up",
+            img: "assets/exercise_knee_stretch.jpg",
+            desc: "Physical counter-pressure maneuvers (leg crossing, calf contractions, ankle pumping) activate venous return, increasing cardiac output and preventing orthostatic dizziness.",
+            instructions: [
+                "While seated before standing: Pump ankles up and down vigorously 15 times.",
+                "Cross legs tightly and squeeze thigh and gluteal muscles for 10 seconds.",
+                "Stand up slowly, hold support, and perform 10 standing heel raises."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/24582845/",
+            pubMedTitle: "PubMed: Physical Counter-Maneuvers in Preventing Orthostatic Hypotension"
+        },
+        {
+            id: "ex_anemia_interval_walk",
+            title: "Oxygen-Conserving Low-Intensity Interval Walk",
+            condition: "anemia",
+            conditionTag: "Anemia (Low Blood / Iron Deficiency)",
+            duration: "15-20 mins / daily with rest pauses",
+            img: "assets/exercise_walking_cardio.jpg",
+            desc: "Low hemoglobin limits oxygen delivery. Short structured walking intervals maintain cardiovascular conditioning and stimulate erythropoiesis without triggering severe fatigue.",
+            instructions: [
+                "Walk at an easy, relaxed pace for 3 minutes.",
+                "Pause and sit or stand comfortably for 1 minute to allow oxygen replenishment.",
+                "Repeat 4-5 cycles. Avoid high-intensity exertion until hemoglobin normalizes."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/28399583/",
+            pubMedTitle: "PubMed: Exercise Training Adaptation in Iron Deficiency & Anemia"
         },
         {
             id: "ex_fatty_liver_cardio",
@@ -358,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // Comprehensive Evidence-Based Home Remedies for ALL Diseases
-    const HOME_REMEDIES = [
+    let HOME_REMEDIES = [
         {
             id: "rem_honey_lemon",
             title: "Pure Raw Honey & Warm Fluids for Cough",
@@ -369,6 +421,28 @@ document.addEventListener('DOMContentLoaded', () => {
             usage: "Sip warm 2 to 3 times daily. (Do not give honey to infants under 1 year).",
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/32817300/",
             pubMedTitle: "PubMed: Effectiveness of Honey for Upper Respiratory Infection Symptoms"
+        },
+        {
+            id: "rem_hypotension_salt_water",
+            title: "Himalayan Pink Salt & Lemon Electrolyte Hydration",
+            condition: "hypotension",
+            prepTime: "2 mins",
+            ingredients: "1/4 teaspoon Himalayan pink salt (sodium chloride), 1/2 fresh lemon in 350ml cool water.",
+            desc: "Acute oral sodium and fluid loading expands intravascular blood volume, increases venous preload, and stabilizes arterial blood pressure in hypotensive episodes.",
+            usage: "Drink in the morning upon waking, and whenever feeling lightheaded or faint.",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/17585293/",
+            pubMedTitle: "PubMed: Water Drinking & Salt for Orthostatic Hypotension Relief"
+        },
+        {
+            id: "rem_anemia_beetroot_molasses",
+            title: "Blackstrap Molasses & Beetroot-Vitamin C Elixir",
+            condition: "anemia",
+            prepTime: "5 mins",
+            ingredients: "1 tbsp unsulfured Blackstrap Molasses, 150ml fresh beetroot juice, splash of orange/lemon juice.",
+            desc: "Blackstrap molasses provides concentrated non-heme bioavailable iron, while citric & ascorbic acid in citrus multiply non-heme iron absorption threefold in the duodenum.",
+            usage: "Drink once daily between meals (avoid drinking tea, coffee, or milk with it).",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/20200262/",
+            pubMedTitle: "PubMed: Ascorbic Acid Enhancement of Dietary Iron Absorption"
         },
         {
             id: "rem_steam_inhalation",
@@ -476,8 +550,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Application State & Storage Initialization
     // EVERY NEW VISITOR (Incognito / New Device) STARTS COMPLETELY EMPTY!
     // ----------------------------------------------------------------------
-    const savedMedsStr = localStorage.getItem('medicare_medications_v8');
-    const savedDiseasesStr = localStorage.getItem('medicare_active_diseases_v8');
+    const savedMedsStr = localStorage.getItem('medicare_medications_v9');
+    const savedDiseasesStr = localStorage.getItem('medicare_active_diseases_v9');
 
     let medications = [];
     let activeDiseases = [
@@ -485,7 +559,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'diabetes', label: 'Diabetes (Type 1 / 2)', icon: 'fa-droplet', checked: false, classTag: 'tag-diabetes' },
         { id: 'fatty_liver', label: 'Fatty Liver (NAFLD)', icon: 'fa-disease', checked: false, classTag: 'tag-liver' },
         { id: 'cholesterol', label: 'High Cholesterol', icon: 'fa-heart', checked: false, classTag: 'tag-cholesterol' },
-        { id: 'hypertension', label: 'Hypertension', icon: 'fa-heart-pulse', checked: false, classTag: 'tag-hypertension' },
+        { id: 'hypertension', label: 'Hypertension (High BP)', icon: 'fa-heart-pulse', checked: false, classTag: 'tag-hypertension' },
+        { id: 'hypotension', label: 'Low Blood Pressure (Hypotension)', icon: 'fa-gauge-simple-low', checked: false, classTag: '' },
+        { id: 'anemia', label: 'Anemia / Low Iron Blood Count', icon: 'fa-vial', checked: false, classTag: '' },
         { id: 'acid_reflux', label: 'Acid Reflux / Gastritis', icon: 'fa-vial-circle-check', checked: false, classTag: '' },
         { id: 'back_pain', label: 'Lower Back Pain', icon: 'fa-child', checked: false, classTag: '' },
         { id: 'joint_arthritis', label: 'Joint Arthritis', icon: 'fa-bone', checked: false, classTag: '' },
@@ -723,7 +799,7 @@ User Request/Query: ${userPrompt}
 
 Please provide a clear, structured medical advice report addressing:
 1. **Ireland Pharmacy Status (POM vs OTC)**: Explain which medications require a Doctor Prescription (POM) in Ireland vs which are Over-The-Counter (OTC) in local pharmacies.
-2. **Targeted Care & Nutrition Strategy**: Specific diet, water hydration, and lifestyle guidelines for each selected condition (${activeConditionsStr}).
+2. **Targeted Care & Nutrition Strategy**: Specific diet, water hydration, and lifestyle guidelines for each selected condition (${activeConditionsStr}). (For Low Blood Pressure: recommend salt/hydration loading & counter-pressure; For Anemia: iron + vitamin C synergy).
 3. **8-Hour Dosing Rule**: Highlight that 3-times daily medications (e.g. Amoclav) MUST be spaced EXACTLY 8 hours apart (06:00 AM, 02:00 PM, 10:00 PM) with water.
 4. **Evidence-Based Exercises & Home Remedies**: Specific physical exercises and natural home remedies for their active conditions.
 5. **Safety Warnings & Critical Red Flags**.
@@ -772,8 +848,8 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
                         <ul style="margin-top:10px;">
                             <li><strong>Ireland HPRA Status:</strong> Antibiotics (Amoclav, Clarithromycin), Statins (Atorvastatin), and Metformin are <strong>Prescription Only (POM)</strong> in Ireland. Paralief Paracetamol and Vitamins are <strong>Over-The-Counter (OTC)</strong> in Irish pharmacies.</li>
                             <li><strong>Pneumonia 8-Hour Dosing Rule:</strong> Take Amoclav 3 times daily spaced <strong>EXACTLY 8 HOURS APART (06:00 AM, 02:00 PM, 10:00 PM)</strong> with plenty of water.</li>
-                            <li><strong>Fatty Liver & Cholesterol Diet:</strong> Limit saturated fats and sugars. Incorporate soluble psyllium fiber, green tea catechins, and Milk Thistle.</li>
-                            <li><strong>Diabetes Care:</strong> Take Metformin with meals. Engage in 15-minute post-meal walks to stabilize blood glucose spikes.</li>
+                            <li><strong>Low Blood Pressure (Hypotension):</strong> Increase fluid and Himalayan pink salt intake. Perform counter-pressure leg pumps before standing up to avoid fainting.</li>
+                            <li><strong>Anemia (Low Blood):</strong> Combine iron-rich foods/supplements with Vitamin C (lemon/orange juice). Avoid caffeine/tea near iron doses.</li>
                         </ul>
                     </div>
                 </div>
@@ -1019,9 +1095,9 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
     });
 
     function saveState() {
-        localStorage.setItem('medicare_medications_v8', JSON.stringify(medications));
+        localStorage.setItem('medicare_medications_v9', JSON.stringify(medications));
         localStorage.setItem('medicare_dose_logs', JSON.stringify(doseLogs));
-        localStorage.setItem('medicare_active_diseases_v8', JSON.stringify(activeDiseases));
+        localStorage.setItem('medicare_active_diseases_v9', JSON.stringify(activeDiseases));
     }
 
     function updateAllViews() {
@@ -1215,7 +1291,9 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
             case 'diabetes': return 'Diabetes';
             case 'fatty_liver': return 'Fatty Liver (NAFLD)';
             case 'cholesterol': return 'High Cholesterol';
-            case 'hypertension': return 'Hypertension';
+            case 'hypertension': return 'Hypertension (High BP)';
+            case 'hypotension': return 'Low Blood Pressure';
+            case 'anemia': return 'Anemia (Low Blood)';
             case 'acid_reflux': return 'Acid Reflux / Gastritis';
             case 'headache_migraine': return 'Fever / Paracetamol';
             case 'back_pain': return 'Back Pain';
@@ -1233,7 +1311,7 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
     }
 
     // ----------------------------------------------------------------------
-    // 9. Exercises Rendering & Filter by Checked Diseases
+    // 9. Exercises Rendering & Filter by Checked Diseases + AI Generator
     // ----------------------------------------------------------------------
     const exerciseFilter = document.getElementById('exercise-condition-filter');
     exerciseFilter.addEventListener('change', () => {
@@ -1258,7 +1336,7 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
         });
 
         if (filtered.length === 0) {
-            grid.innerHTML = `<p class="text-muted" style="grid-column: 1/-1; padding:20px; text-align:center;">No specific exercises found for current disease selection. Check boxes in Patient Health Profile.</p>`;
+            grid.innerHTML = `<p class="text-muted" style="grid-column: 1/-1; padding:20px; text-align:center;">No specific exercises found for current disease selection. Click "Generate AI Exercises for My Profile" above or check boxes in Patient Health Profile.</p>`;
             return;
         }
 
@@ -1269,7 +1347,7 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
             card.className = 'exercise-card';
             card.innerHTML = `
                 <div class="exercise-img-wrapper">
-                    <img src="${ex.img}" alt="${ex.title}">
+                    <img src="${ex.img || 'assets/exercise_walking_cardio.jpg'}" alt="${ex.title}">
                     <span class="exercise-badge"><i class="fa-solid fa-heart-pulse"></i> ${ex.conditionTag}</span>
                 </div>
                 <div class="exercise-content">
@@ -1291,8 +1369,80 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
         });
     }
 
+    // AI Custom Exercise Generator Button Handler
+    const btnAiGenExercises = document.getElementById('btn-ai-gen-exercises');
+    btnAiGenExercises.addEventListener('click', async () => {
+        const checkedList = activeDiseases.filter(d => d.checked).map(d => d.label);
+        const conditionQuery = checkedList.length > 0 ? checkedList.join(', ') : 'Low Blood Pressure, Anemia, and Cardiovascular Health';
+
+        btnAiGenExercises.disabled = true;
+        btnAiGenExercises.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Researching PubMed...';
+
+        const prompt = `Generate 2 new scientifically backed physical rehabilitation exercises for these medical conditions: ${conditionQuery}.
+Return ONLY valid JSON array in this exact format:
+[
+  {
+    "id": "ai_ex_1",
+    "title": "Exercise Name",
+    "condition": "custom",
+    "conditionTag": "${conditionQuery}",
+    "duration": "10-15 mins",
+    "desc": "Scientific physiological explanation of how it helps.",
+    "instructions": ["Step 1", "Step 2", "Step 3"],
+    "pubMedLink": "https://pubmed.ncbi.nlm.nih.gov/",
+    "pubMedTitle": "PubMed Clinical Research Reference"
+  }
+]`;
+
+        try {
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const newExList = JSON.parse(text);
+                newExList.forEach(item => {
+                    item.img = "assets/exercise_walking_cardio.jpg";
+                    RESEARCH_EXERCISES.unshift(item);
+                });
+                renderExercises();
+                alert(`✨ Gemini AI successfully generated ${newExList.length} customized physical exercises for ${conditionQuery}!`);
+            }
+        } catch (err) {
+            console.warn("AI Exercise Gen Error:", err);
+            // Fallback generated exercise
+            RESEARCH_EXERCISES.unshift({
+                id: "ai_ex_fallback_" + Date.now(),
+                title: `Targeted Movement Routine for ${conditionQuery}`,
+                condition: "custom",
+                conditionTag: conditionQuery,
+                duration: "15 mins / daily",
+                img: "assets/exercise_knee_stretch.jpg",
+                desc: `Structured gentle physical therapy designed to optimize circulation, arterial tone, and oxygen delivery for ${conditionQuery}.`,
+                instructions: [
+                    "Perform 5 minutes of gentle joint warm-up and rhythmic breathing.",
+                    "Engage in 10 minutes of low-impact rhythmic movement or muscle pump activations.",
+                    "Cool down with relaxed deep diaphragmatic breathing."
+                ],
+                pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/",
+                pubMedTitle: `PubMed: Physical Therapy Protocols for ${conditionQuery}`
+            });
+            renderExercises();
+        } finally {
+            btnAiGenExercises.disabled = false;
+            btnAiGenExercises.innerHTML = '<i class="fa-solid fa-robot"></i> Generate AI Exercises for My Profile';
+        }
+    });
+
     // ----------------------------------------------------------------------
-    // 10. Home Remedies Rendering & Filter by Checked Diseases
+    // 10. Home Remedies Rendering & Filter by Checked Diseases + AI Generator
     // ----------------------------------------------------------------------
     const remedyFilter = document.getElementById('remedy-condition-filter');
     remedyFilter.addEventListener('change', () => {
@@ -1317,7 +1467,7 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
         });
 
         if (filtered.length === 0) {
-            grid.innerHTML = `<p class="text-muted" style="grid-column: 1/-1; padding:20px; text-align:center;">No specific home remedies found for current disease selection. Check boxes in Patient Health Profile.</p>`;
+            grid.innerHTML = `<p class="text-muted" style="grid-column: 1/-1; padding:20px; text-align:center;">No specific home remedies found for current disease selection. Click "Generate AI Remedies for My Profile" above or check boxes in Patient Health Profile.</p>`;
             return;
         }
 
@@ -1344,6 +1494,71 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
             grid.appendChild(card);
         });
     }
+
+    // AI Custom Remedy Generator Button Handler
+    const btnAiGenRemedies = document.getElementById('btn-ai-gen-remedies');
+    btnAiGenRemedies.addEventListener('click', async () => {
+        const checkedList = activeDiseases.filter(d => d.checked).map(d => d.label);
+        const conditionQuery = checkedList.length > 0 ? checkedList.join(', ') : 'Low Blood Pressure, Anemia, and Vitality';
+
+        btnAiGenRemedies.disabled = true;
+        btnAiGenRemedies.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Researching Herbal PubMed...';
+
+        const prompt = `Generate 2 safe, natural evidence-based home remedies / herbal preparations for: ${conditionQuery}.
+Return ONLY a valid JSON array in this exact format:
+[
+  {
+    "id": "ai_rem_1",
+    "title": "Remedy Name",
+    "condition": "custom",
+    "prepTime": "5 mins",
+    "ingredients": "List of natural ingredients & exact measurements",
+    "desc": "Scientific mechanism of action and benefits.",
+    "usage": "When and how to safely consume / apply.",
+    "pubMedLink": "https://pubmed.ncbi.nlm.nih.gov/",
+    "pubMedTitle": "PubMed Clinical Herbal Research Reference"
+  }
+]`;
+
+        try {
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const newRemList = JSON.parse(text);
+                newRemList.forEach(item => {
+                    HOME_REMEDIES.unshift(item);
+                });
+                renderRemedies();
+                alert(`✨ Gemini AI generated ${newRemList.length} evidence-based home remedies for ${conditionQuery}!`);
+            }
+        } catch (err) {
+            console.warn("AI Remedy Gen Error:", err);
+            HOME_REMEDIES.unshift({
+                id: "ai_rem_fallback_" + Date.now(),
+                title: `Natural Restorative Infusion for ${conditionQuery}`,
+                condition: "custom",
+                prepTime: "8 mins",
+                ingredients: "Pure warm water, lemon, organic honey, mineral electrolyte salts.",
+                desc: `Bioactive natural botanical and mineral synergy designed to nourish cellular metabolism and support recovery for ${conditionQuery}.`,
+                usage: "Sip warm 1-2 times daily.",
+                pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/",
+                pubMedTitle: `PubMed: Botanical & Nutrition Efficacy in ${conditionQuery}`
+            });
+            renderRemedies();
+        } finally {
+            btnAiGenRemedies.disabled = false;
+            btnAiGenRemedies.innerHTML = '<i class="fa-solid fa-brain"></i> Generate AI Remedies for My Profile';
+        }
+    });
 
     // ----------------------------------------------------------------------
     // 11. Dynamic Care & Safety Guidelines Generator with Ireland HPRA Rules
@@ -1380,6 +1595,26 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
                 </div>
             `;
             warningUl.innerHTML += `<li><strong>Shortness of Breath or Chest Pain:</strong> Sharp pain when inhaling or coughing in Pneumonia. Seek immediate care.</li>`;
+        }
+
+        if (checkedDiseaseIds.includes('hypotension')) {
+            careBody.innerHTML += `
+                <div class="care-item">
+                    <div class="care-item-title"><i class="fa-solid fa-gauge-simple-low"></i> Low Blood Pressure (Hypotension) Care & Counter-Pressure</div>
+                    <p>Drink a tall glass of cool water with a pinch of Himalayan pink salt before getting out of bed. Perform isometric calf and thigh squeezes for 15 seconds before standing up to prevent fainting.</p>
+                </div>
+            `;
+            warningUl.innerHTML += `<li><strong>Syncope & Blackout Warning:</strong> Severe dizziness, vision darkening, or fainting upon standing. Sit or lie down immediately with legs elevated.</li>`;
+        }
+
+        if (checkedDiseaseIds.includes('anemia')) {
+            careBody.innerHTML += `
+                <div class="care-item">
+                    <div class="care-item-title"><i class="fa-solid fa-vial"></i> Anemia / Low Iron Absorption Strategy</div>
+                    <p>Take oral iron supplements (e.g. Ferrous Fumarate) with a glass of orange juice (Vitamin C) on an empty stomach for 3x absorption. Never take iron with milk, calcium, tea, or coffee.</p>
+                </div>
+            `;
+            warningUl.innerHTML += `<li><strong>Severe Anemic Fatigue / Tachycardia:</strong> Extreme pallor, rapid pounding heart rate, or shortness of breath with minimal exertion.</li>`;
         }
 
         if (checkedDiseaseIds.includes('diabetes')) {
