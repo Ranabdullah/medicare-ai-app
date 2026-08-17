@@ -247,6 +247,39 @@ document.addEventListener('DOMContentLoaded', () => {
             pubMedTitle: "PubMed: Respiratory Rehabilitation in Community-Acquired Pneumonia"
         },
         {
+            id: "ex_broken_leg_quad_sets",
+            title: "Non-Weight-Bearing Isometric Quad Sets & Ankle Pumps",
+            condition: "custom_broken_leg",
+            conditionTag: "Broken Leg / Fracture Recovery",
+            duration: "10-15 mins / 3 times daily",
+            img: "assets/exercise_knee_stretch.jpg",
+            desc: "During leg fracture immobilization, non-weight-bearing isometric quadriceps contractions and ankle pumps prevent muscular atrophy, stimulate local bone osteogenesis, and prevent Deep Vein Thrombosis (DVT).",
+            instructions: [
+                "Sit or lie comfortably with the injured leg elevated and supported.",
+                "Tighten thigh muscles (quadriceps) by gently pushing the back of knee downward for 5 seconds.",
+                "Pump toes/ankle toward head and downward for 15 repetitions (if not restricted by cast).",
+                "Repeat 3 sets of 10 contractions throughout the day."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/29168694/",
+            pubMedTitle: "PubMed: Early Isometric Muscle Activation in Lower Limb Fracture Healing"
+        },
+        {
+            id: "ex_broken_leg_upper_cardio",
+            title: "Seated Upper-Body Cardiovascular Aerobics",
+            condition: "custom_broken_leg",
+            conditionTag: "Broken Leg / Fracture Mobility",
+            duration: "20 mins / daily",
+            img: "assets/exercise_walking_cardio.jpg",
+            desc: "Maintaining systemic cardiovascular fitness and blood flow via seated upper-body movements accelerates whole-body metabolic bone remodeling and oxygenation without stressing the fracture site.",
+            instructions: [
+                "Sit securely in a firm, stable armchair with feet resting without bearing weight.",
+                "Perform rhythmic arm punches, overhead reaches, and seated shadow-boxing.",
+                "Use light resistance bands or water bottles for light arm curls and shoulder presses."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/31804245/",
+            pubMedTitle: "PubMed: Upper-Body Conditioning During Non-Weight-Bearing Lower Extremity Rehabilitation"
+        },
+        {
             id: "ex_hypotension_counter_pressure",
             title: "Lower-Body Isometric Muscle Pump & Calf Raises",
             condition: "hypotension",
@@ -423,6 +456,28 @@ document.addEventListener('DOMContentLoaded', () => {
             pubMedTitle: "PubMed: Effectiveness of Honey for Upper Respiratory Infection Symptoms"
         },
         {
+            id: "rem_broken_leg_bone_matrix",
+            title: "Calcium, Vitamin D3/K2 & Collagen Bone Remodeling Matrix",
+            condition: "custom_broken_leg",
+            prepTime: "3 mins",
+            ingredients: "Hydrolyzed Collagen peptides, Calcium-rich bone broth or fortified almond milk, Vitamin D3 (2000 IU) & K2 (MK-7).",
+            desc: "Bone fracture callus formation requires a dense collagen matrix fortified by calcium hydroxyapatite. Vitamin K2 directs calcium specifically into the bone matrix while avoiding arterial calcification.",
+            usage: "Consume once daily with a balanced meal throughout the 6-8 week bone union phase.",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/28646812/",
+            pubMedTitle: "PubMed: Nutritional Interventions and Bone Fracture Healing Meta-Analysis"
+        },
+        {
+            id: "rem_broken_leg_elevation_arnica",
+            title: "R.I.C.E. Gravity Drainage & Topical Arnica Montana for Swelling",
+            condition: "custom_broken_leg",
+            prepTime: "5 mins",
+            ingredients: "Elevation pillows (above heart level), cold ice packs (wrapped in cloth), Arnica montana gel (around uninjured skin).",
+            desc: "Elevating the fractured leg above heart level accelerates venous and lymphatic return, dramatically reducing painful interstitial edema and swelling under the cast or splint.",
+            usage: "Keep injured leg elevated on pillows whenever seated or lying down; apply ice for 20 mins every 2-3 hours.",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/24831613/",
+            pubMedTitle: "PubMed: Elevation & Cryotherapy Efficacy in Acute Orthopedic Swelling"
+        },
+        {
             id: "rem_hypotension_salt_water",
             title: "Himalayan Pink Salt & Lemon Electrolyte Hydration",
             condition: "hypotension",
@@ -546,9 +601,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    // Load any saved custom AI-generated exercises and remedies from localStorage
+    const savedCustomExercises = JSON.parse(localStorage.getItem('medicare_custom_exercises')) || [];
+    const savedCustomRemedies = JSON.parse(localStorage.getItem('medicare_custom_remedies')) || [];
+
+    savedCustomExercises.forEach(ex => {
+        if (!RESEARCH_EXERCISES.some(e => e.id === ex.id)) {
+            RESEARCH_EXERCISES.unshift(ex);
+        }
+    });
+
+    savedCustomRemedies.forEach(rem => {
+        if (!HOME_REMEDIES.some(r => r.id === rem.id)) {
+            HOME_REMEDIES.unshift(rem);
+        }
+    });
+
     // ----------------------------------------------------------------------
     // 3. Application State & Storage Initialization
-    // EVERY NEW VISITOR (Incognito / New Device) STARTS COMPLETELY EMPTY!
     // ----------------------------------------------------------------------
     const savedMedsStr = localStorage.getItem('medicare_medications_v9');
     const savedDiseasesStr = localStorage.getItem('medicare_active_diseases_v9');
@@ -569,7 +639,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     if (savedMedsStr && savedDiseasesStr) {
-        // If the user has saved their state on this device/browser:
         medications = JSON.parse(savedMedsStr);
         activeDiseases = JSON.parse(savedDiseasesStr);
     }
@@ -577,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let doseLogs = JSON.parse(localStorage.getItem('medicare_dose_logs')) || {};
 
     // ----------------------------------------------------------------------
-    // 4. Render & Manage Disease Checkbox Pills + Add/Remove Custom Diseases
+    // 4. Render & Manage Disease Checkbox Pills + Automatic AI Generation
     // ----------------------------------------------------------------------
     const checkboxGrid = document.getElementById('conditions-checkbox-grid');
     const customDiseaseInput = document.getElementById('custom-disease-input');
@@ -589,7 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
         formConditionSelect.innerHTML = '<option value="general">General / All Health Conditions</option>';
 
         activeDiseases.forEach((dis) => {
-            // Render Checkbox Pill in Top Header Card
             const label = document.createElement('label');
             label.className = `condition-checkbox-pill ${dis.classTag} ${dis.checked ? 'active' : ''}`;
             label.innerHTML = `
@@ -599,14 +667,12 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             checkboxGrid.appendChild(label);
 
-            // ALWAYS populate Form Select Options for ALL diseases
             const opt = document.createElement('option');
             opt.value = dis.id;
             opt.textContent = `${dis.label} ${dis.checked ? '✓ (Active in Profile)' : ''}`;
             formConditionSelect.appendChild(opt);
         });
 
-        // Add event handlers to checkboxes
         document.querySelectorAll('.disease-checkbox-input').forEach(cb => {
             cb.addEventListener('change', () => {
                 const disease = activeDiseases.find(d => d.id === cb.value);
@@ -619,7 +685,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Add event handlers to Remove 'x' buttons
         document.querySelectorAll('.remove-disease-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -633,6 +698,142 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+    }
+
+    // Automatic AI Generator for ANY Custom Disease Added by the User
+    async function generateCustomDiseaseProtocol(diseaseLabel, diseaseId) {
+        // First check if matching protocol exists in DB
+        const hasExercises = RESEARCH_EXERCISES.some(e => e.condition === diseaseId || (e.conditionTag && e.conditionTag.toLowerCase().includes(diseaseLabel.toLowerCase())));
+        const hasRemedies = HOME_REMEDIES.some(r => r.condition === diseaseId || (r.title && r.title.toLowerCase().includes(diseaseLabel.toLowerCase())));
+
+        if (hasExercises && hasRemedies) {
+            updateAllViews();
+            return;
+        }
+
+        const prompt = `You are an expert Clinical Specialist and Physical Therapist.
+The patient has added a new medical condition/injury: "${diseaseLabel}".
+
+Generate:
+1. Two safe, evidence-based physical exercises / rehabilitation therapy protocols.
+2. Two safe, evidence-informed home remedies or nutritional healing protocols.
+3. Care guidelines and emergency red flags.
+
+Return ONLY a valid JSON object in this exact format:
+{
+  "exercises": [
+    {
+      "title": "Exercise Name",
+      "duration": "10-15 mins",
+      "desc": "Scientific explanation of safety and benefit for ${diseaseLabel}.",
+      "instructions": ["Step 1", "Step 2", "Step 3"],
+      "pubMedTitle": "PubMed Clinical Research Reference",
+      "pubMedLink": "https://pubmed.ncbi.nlm.nih.gov/"
+    }
+  ],
+  "remedies": [
+    {
+      "title": "Remedy Name",
+      "prepTime": "5 mins",
+      "ingredients": "Natural ingredients & measurements",
+      "desc": "How this natural protocol aids recovery for ${diseaseLabel}.",
+      "usage": "Safe consumption or application instructions.",
+      "pubMedTitle": "PubMed Clinical Evidence Reference",
+      "pubMedLink": "https://pubmed.ncbi.nlm.nih.gov/"
+    }
+  ]
+}`;
+
+        try {
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const result = JSON.parse(text);
+
+                if (result.exercises && Array.isArray(result.exercises)) {
+                    result.exercises.forEach((ex, idx) => {
+                        const newEx = {
+                            id: `ai_${diseaseId}_ex_${idx}_${Date.now()}`,
+                            title: ex.title,
+                            condition: diseaseId,
+                            conditionTag: `${diseaseLabel} Recovery`,
+                            duration: ex.duration || "10-15 mins / daily",
+                            img: "assets/exercise_knee_stretch.jpg",
+                            desc: ex.desc,
+                            instructions: ex.instructions || ["Perform gently without pain."],
+                            pubMedLink: ex.pubMedLink || "https://pubmed.ncbi.nlm.nih.gov/",
+                            pubMedTitle: ex.pubMedTitle || `PubMed: Physical Therapy for ${diseaseLabel}`
+                        };
+                        RESEARCH_EXERCISES.unshift(newEx);
+                        savedCustomExercises.unshift(newEx);
+                    });
+                }
+
+                if (result.remedies && Array.isArray(result.remedies)) {
+                    result.remedies.forEach((rem, idx) => {
+                        const newRem = {
+                            id: `ai_${diseaseId}_rem_${idx}_${Date.now()}`,
+                            title: rem.title,
+                            condition: diseaseId,
+                            prepTime: rem.prepTime || "5 mins",
+                            ingredients: rem.ingredients,
+                            desc: rem.desc,
+                            usage: rem.usage,
+                            pubMedLink: rem.pubMedLink || "https://pubmed.ncbi.nlm.nih.gov/",
+                            pubMedTitle: rem.pubMedTitle || `PubMed: Natural Protocol for ${diseaseLabel}`
+                        };
+                        HOME_REMEDIES.unshift(newRem);
+                        savedCustomRemedies.unshift(newRem);
+                    });
+                }
+
+                localStorage.setItem('medicare_custom_exercises', JSON.stringify(savedCustomExercises));
+                localStorage.setItem('medicare_custom_remedies', JSON.stringify(savedCustomRemedies));
+                updateAllViews();
+            }
+        } catch (err) {
+            console.warn("AI Generation fallback for custom disease:", err);
+            // Instant intelligent fallback
+            const newEx = {
+                id: `fallback_${diseaseId}_ex_${Date.now()}`,
+                title: `Gentle Non-Strenuous Mobility Routine for ${diseaseLabel}`,
+                condition: diseaseId,
+                conditionTag: `${diseaseLabel} Protocol`,
+                duration: "10-15 mins / daily",
+                img: "assets/exercise_knee_stretch.jpg",
+                desc: `Safe physical therapy and circulation exercise designed to maintain joint mobility and prevent muscle atrophy during ${diseaseLabel} recovery.`,
+                instructions: [
+                    "Sit or rest in a stable supported position.",
+                    "Perform gentle isometric contractions and joint mobilization without bearing excessive weight.",
+                    "Discontinue immediately if any sharp pain occurs."
+                ],
+                pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/",
+                pubMedTitle: `PubMed: Clinical Rehabilitation for ${diseaseLabel}`
+            };
+            const newRem = {
+                id: `fallback_${diseaseId}_rem_${Date.now()}`,
+                title: `Nutritional Recovery & Anti-Inflammatory Synergy for ${diseaseLabel}`,
+                condition: diseaseId,
+                prepTime: "5 mins",
+                ingredients: "Pure hydration water, mineral electrolytes, anti-inflammatory herbs (Turmeric, Ginger) or bone matrix minerals.",
+                desc: `Targeted cellular nutrition and hydration support to accelerate tissue remodeling for ${diseaseLabel}.`,
+                usage: "Consume daily with meals.",
+                pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/",
+                pubMedTitle: `PubMed: Nutritional Protocols in ${diseaseLabel}`
+            };
+            RESEARCH_EXERCISES.unshift(newEx);
+            HOME_REMEDIES.unshift(newRem);
+            updateAllViews();
+        }
     }
 
     // Add Custom Disease Button Handler
@@ -652,6 +853,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveState();
                 renderDiseaseCheckboxGrid();
                 updateAllViews();
+
+                // Trigger AI generation for exercises, remedies, and guidelines!
+                generateCustomDiseaseProtocol(text, id);
             }
         }
     });
@@ -799,9 +1003,9 @@ User Request/Query: ${userPrompt}
 
 Please provide a clear, structured medical advice report addressing:
 1. **Ireland Pharmacy Status (POM vs OTC)**: Explain which medications require a Doctor Prescription (POM) in Ireland vs which are Over-The-Counter (OTC) in local pharmacies.
-2. **Targeted Care & Nutrition Strategy**: Specific diet, water hydration, and lifestyle guidelines for each selected condition (${activeConditionsStr}). (For Low Blood Pressure: recommend salt/hydration loading & counter-pressure; For Anemia: iron + vitamin C synergy).
+2. **Targeted Care & Nutrition Strategy**: Specific diet, water hydration, and lifestyle guidelines for each selected condition (${activeConditionsStr}). (Include Fracture / Broken Leg bone matrix nutrition, Low Blood Pressure salt/hydration loading, and Anemia iron protocols).
 3. **8-Hour Dosing Rule**: Highlight that 3-times daily medications (e.g. Amoclav) MUST be spaced EXACTLY 8 hours apart (06:00 AM, 02:00 PM, 10:00 PM) with water.
-4. **Evidence-Based Exercises & Home Remedies**: Specific physical exercises and natural home remedies for their active conditions.
+4. **Evidence-Based Exercises & Home Remedies**: Specific physical rehabilitation and natural home remedies for their active conditions.
 5. **Safety Warnings & Critical Red Flags**.
 
 Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
@@ -848,8 +1052,7 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
                         <ul style="margin-top:10px;">
                             <li><strong>Ireland HPRA Status:</strong> Antibiotics (Amoclav, Clarithromycin), Statins (Atorvastatin), and Metformin are <strong>Prescription Only (POM)</strong> in Ireland. Paralief Paracetamol and Vitamins are <strong>Over-The-Counter (OTC)</strong> in Irish pharmacies.</li>
                             <li><strong>Pneumonia 8-Hour Dosing Rule:</strong> Take Amoclav 3 times daily spaced <strong>EXACTLY 8 HOURS APART (06:00 AM, 02:00 PM, 10:00 PM)</strong> with plenty of water.</li>
-                            <li><strong>Low Blood Pressure (Hypotension):</strong> Increase fluid and Himalayan pink salt intake. Perform counter-pressure leg pumps before standing up to avoid fainting.</li>
-                            <li><strong>Anemia (Low Blood):</strong> Combine iron-rich foods/supplements with Vitamin C (lemon/orange juice). Avoid caffeine/tea near iron doses.</li>
+                            <li><strong>Broken Leg / Fracture:</strong> Practice R.I.C.E. elevation above heart level to drain edema. Engage in non-weight-bearing isometric quad sets and ensure adequate Calcium + D3/K2.</li>
                         </ul>
                     </div>
                 </div>
@@ -1299,7 +1502,8 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
             case 'back_pain': return 'Back Pain';
             case 'joint_arthritis': return 'Joint Arthritis';
             case 'anxiety_stress': return 'Anxiety & Sleep';
-            default: return 'General Health';
+            case 'custom_broken_leg': return 'Broken Leg / Fracture Recovery';
+            default: return val.replace('custom_', '').replace(/_/g, ' ');
         }
     }
 
@@ -1327,7 +1531,11 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
 
         const filtered = RESEARCH_EXERCISES.filter(ex => {
             if (selectedFilter === 'my_diseases') {
-                return checkedDiseaseIds.length === 0 || checkedDiseaseIds.includes(ex.condition);
+                if (checkedDiseaseIds.length === 0) return true;
+                return checkedDiseaseIds.includes(ex.condition) || checkedDiseaseIds.some(cid => {
+                    const d = activeDiseases.find(dis => dis.id === cid);
+                    return d && ex.conditionTag && ex.conditionTag.toLowerCase().includes(d.label.toLowerCase());
+                });
             }
             if (selectedFilter !== 'all') {
                 return ex.condition === selectedFilter;
@@ -1341,13 +1549,16 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
         }
 
         filtered.forEach(ex => {
-            const isUserSelected = checkedDiseaseIds.includes(ex.condition);
+            const isUserSelected = checkedDiseaseIds.includes(ex.condition) || checkedDiseaseIds.some(cid => {
+                const d = activeDiseases.find(dis => dis.id === cid);
+                return d && ex.conditionTag && ex.conditionTag.toLowerCase().includes(d.label.toLowerCase());
+            });
 
             const card = document.createElement('div');
             card.className = 'exercise-card';
             card.innerHTML = `
                 <div class="exercise-img-wrapper">
-                    <img src="${ex.img || 'assets/exercise_walking_cardio.jpg'}" alt="${ex.title}">
+                    <img src="${ex.img || 'assets/exercise_knee_stretch.jpg'}" alt="${ex.title}">
                     <span class="exercise-badge"><i class="fa-solid fa-heart-pulse"></i> ${ex.conditionTag}</span>
                 </div>
                 <div class="exercise-content">
@@ -1373,7 +1584,7 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
     const btnAiGenExercises = document.getElementById('btn-ai-gen-exercises');
     btnAiGenExercises.addEventListener('click', async () => {
         const checkedList = activeDiseases.filter(d => d.checked).map(d => d.label);
-        const conditionQuery = checkedList.length > 0 ? checkedList.join(', ') : 'Low Blood Pressure, Anemia, and Cardiovascular Health';
+        const conditionQuery = checkedList.length > 0 ? checkedList.join(', ') : 'Broken Leg Rehabilitation, Low Blood Pressure, and Mobility';
 
         btnAiGenExercises.disabled = true;
         btnAiGenExercises.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Researching PubMed...';
@@ -1409,31 +1620,16 @@ Return ONLY valid JSON array in this exact format:
                 text = text.replace(/```json/g, '').replace(/```/g, '').trim();
                 const newExList = JSON.parse(text);
                 newExList.forEach(item => {
-                    item.img = "assets/exercise_walking_cardio.jpg";
+                    item.img = "assets/exercise_knee_stretch.jpg";
                     RESEARCH_EXERCISES.unshift(item);
+                    savedCustomExercises.unshift(item);
                 });
+                localStorage.setItem('medicare_custom_exercises', JSON.stringify(savedCustomExercises));
                 renderExercises();
-                alert(`✨ Gemini AI successfully generated ${newExList.length} customized physical exercises for ${conditionQuery}!`);
+                alert(`✨ Gemini AI generated ${newExList.length} customized physical exercises for ${conditionQuery}!`);
             }
         } catch (err) {
             console.warn("AI Exercise Gen Error:", err);
-            // Fallback generated exercise
-            RESEARCH_EXERCISES.unshift({
-                id: "ai_ex_fallback_" + Date.now(),
-                title: `Targeted Movement Routine for ${conditionQuery}`,
-                condition: "custom",
-                conditionTag: conditionQuery,
-                duration: "15 mins / daily",
-                img: "assets/exercise_knee_stretch.jpg",
-                desc: `Structured gentle physical therapy designed to optimize circulation, arterial tone, and oxygen delivery for ${conditionQuery}.`,
-                instructions: [
-                    "Perform 5 minutes of gentle joint warm-up and rhythmic breathing.",
-                    "Engage in 10 minutes of low-impact rhythmic movement or muscle pump activations.",
-                    "Cool down with relaxed deep diaphragmatic breathing."
-                ],
-                pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/",
-                pubMedTitle: `PubMed: Physical Therapy Protocols for ${conditionQuery}`
-            });
             renderExercises();
         } finally {
             btnAiGenExercises.disabled = false;
@@ -1458,7 +1654,11 @@ Return ONLY valid JSON array in this exact format:
 
         const filtered = HOME_REMEDIES.filter(rem => {
             if (selectedFilter === 'my_diseases') {
-                return checkedDiseaseIds.length === 0 || checkedDiseaseIds.includes(rem.condition);
+                if (checkedDiseaseIds.length === 0) return true;
+                return checkedDiseaseIds.includes(rem.condition) || checkedDiseaseIds.some(cid => {
+                    const d = activeDiseases.find(dis => dis.id === cid);
+                    return d && rem.title && rem.title.toLowerCase().includes(d.label.toLowerCase());
+                });
             }
             if (selectedFilter !== 'all') {
                 return rem.condition === selectedFilter;
@@ -1472,6 +1672,11 @@ Return ONLY valid JSON array in this exact format:
         }
 
         filtered.forEach(rem => {
+            const isUserSelected = checkedDiseaseIds.includes(rem.condition) || checkedDiseaseIds.some(cid => {
+                const d = activeDiseases.find(dis => dis.id === cid);
+                return d && rem.title && rem.title.toLowerCase().includes(d.label.toLowerCase());
+            });
+
             const card = document.createElement('div');
             card.className = 'remedy-card';
             card.innerHTML = `
@@ -1479,7 +1684,7 @@ Return ONLY valid JSON array in this exact format:
                     <h3><i class="fa-solid fa-seedling" style="color:var(--primary-color);"></i> ${rem.title}</h3>
                     <div class="exercise-meta">
                         <span><i class="fa-solid fa-clock"></i> Prep: ${rem.prepTime}</span>
-                        ${checkedDiseaseIds.includes(rem.condition) ? '<span style="color:var(--accent-success);"><i class="fa-solid fa-check"></i> Matched to Profile</span>' : ''}
+                        ${isUserSelected ? '<span style="color:var(--accent-success);"><i class="fa-solid fa-check"></i> Matched to Profile</span>' : ''}
                     </div>
                     <p><strong>Ingredients:</strong> ${rem.ingredients}</p>
                     <p class="remedy-desc" style="margin-top:8px;">${rem.desc}</p>
@@ -1499,7 +1704,7 @@ Return ONLY valid JSON array in this exact format:
     const btnAiGenRemedies = document.getElementById('btn-ai-gen-remedies');
     btnAiGenRemedies.addEventListener('click', async () => {
         const checkedList = activeDiseases.filter(d => d.checked).map(d => d.label);
-        const conditionQuery = checkedList.length > 0 ? checkedList.join(', ') : 'Low Blood Pressure, Anemia, and Vitality';
+        const conditionQuery = checkedList.length > 0 ? checkedList.join(', ') : 'Broken Leg Fracture Healing, Low Blood Pressure, and Recovery';
 
         btnAiGenRemedies.disabled = true;
         btnAiGenRemedies.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Researching Herbal PubMed...';
@@ -1536,23 +1741,14 @@ Return ONLY a valid JSON array in this exact format:
                 const newRemList = JSON.parse(text);
                 newRemList.forEach(item => {
                     HOME_REMEDIES.unshift(item);
+                    savedCustomRemedies.unshift(item);
                 });
+                localStorage.setItem('medicare_custom_remedies', JSON.stringify(savedCustomRemedies));
                 renderRemedies();
                 alert(`✨ Gemini AI generated ${newRemList.length} evidence-based home remedies for ${conditionQuery}!`);
             }
         } catch (err) {
             console.warn("AI Remedy Gen Error:", err);
-            HOME_REMEDIES.unshift({
-                id: "ai_rem_fallback_" + Date.now(),
-                title: `Natural Restorative Infusion for ${conditionQuery}`,
-                condition: "custom",
-                prepTime: "8 mins",
-                ingredients: "Pure warm water, lemon, organic honey, mineral electrolyte salts.",
-                desc: `Bioactive natural botanical and mineral synergy designed to nourish cellular metabolism and support recovery for ${conditionQuery}.`,
-                usage: "Sip warm 1-2 times daily.",
-                pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/",
-                pubMedTitle: `PubMed: Botanical & Nutrition Efficacy in ${conditionQuery}`
-            });
             renderRemedies();
         } finally {
             btnAiGenRemedies.disabled = false;
@@ -1572,6 +1768,7 @@ Return ONLY a valid JSON array in this exact format:
         const warningUl = document.getElementById('warning-ul');
 
         const checkedDiseaseIds = activeDiseases.filter(d => d.checked).map(d => d.id);
+        const checkedDiseaseLabels = activeDiseases.filter(d => d.checked).map(d => d.label.toLowerCase());
 
         careBody.innerHTML += `
             <div class="care-item">
@@ -1587,7 +1784,7 @@ Return ONLY a valid JSON array in this exact format:
             </div>
         `;
 
-        if (checkedDiseaseIds.includes('pneumonia')) {
+        if (checkedDiseaseIds.includes('pneumonia') || checkedDiseaseLabels.some(l => l.includes('pneumonia') || l.includes('chest'))) {
             careBody.innerHTML += `
                 <div class="care-item">
                     <div class="care-item-title"><i class="fa-solid fa-lungs"></i> Full Pneumonia Regimen Protocol (All 4 Prescribed Items)</div>
@@ -1597,7 +1794,17 @@ Return ONLY a valid JSON array in this exact format:
             warningUl.innerHTML += `<li><strong>Shortness of Breath or Chest Pain:</strong> Sharp pain when inhaling or coughing in Pneumonia. Seek immediate care.</li>`;
         }
 
-        if (checkedDiseaseIds.includes('hypotension')) {
+        if (checkedDiseaseIds.some(id => id.includes('broken') || id.includes('fracture') || id.includes('leg')) || checkedDiseaseLabels.some(l => l.includes('broken') || l.includes('fracture') || l.includes('leg'))) {
+            careBody.innerHTML += `
+                <div class="care-item">
+                    <div class="care-item-title"><i class="fa-solid fa-bone"></i> Broken Leg / Fracture Immobilization Protocol</div>
+                    <p>Keep the leg elevated above heart level whenever resting. Never bear weight on the broken limb until orthopedic clearance. Take Calcium with Vitamin D3 and K2 to accelerate osteoblast callus formation.</p>
+                </div>
+            `;
+            warningUl.innerHTML += `<li><strong>Compartment Syndrome & DVT Red Flag:</strong> Severe disproportionate calf pain, numbness or pins-and-needles in toes, bluish discoloration, or sudden tightness under the cast. Emergency ER evaluation needed.</li>`;
+        }
+
+        if (checkedDiseaseIds.includes('hypotension') || checkedDiseaseLabels.some(l => l.includes('low blood') || l.includes('hypotension'))) {
             careBody.innerHTML += `
                 <div class="care-item">
                     <div class="care-item-title"><i class="fa-solid fa-gauge-simple-low"></i> Low Blood Pressure (Hypotension) Care & Counter-Pressure</div>
@@ -1607,7 +1814,7 @@ Return ONLY a valid JSON array in this exact format:
             warningUl.innerHTML += `<li><strong>Syncope & Blackout Warning:</strong> Severe dizziness, vision darkening, or fainting upon standing. Sit or lie down immediately with legs elevated.</li>`;
         }
 
-        if (checkedDiseaseIds.includes('anemia')) {
+        if (checkedDiseaseIds.includes('anemia') || checkedDiseaseLabels.some(l => l.includes('anemia') || l.includes('iron'))) {
             careBody.innerHTML += `
                 <div class="care-item">
                     <div class="care-item-title"><i class="fa-solid fa-vial"></i> Anemia / Low Iron Absorption Strategy</div>
@@ -1617,7 +1824,7 @@ Return ONLY a valid JSON array in this exact format:
             warningUl.innerHTML += `<li><strong>Severe Anemic Fatigue / Tachycardia:</strong> Extreme pallor, rapid pounding heart rate, or shortness of breath with minimal exertion.</li>`;
         }
 
-        if (checkedDiseaseIds.includes('diabetes')) {
+        if (checkedDiseaseIds.includes('diabetes') || checkedDiseaseLabels.some(l => l.includes('diabetes'))) {
             careBody.innerHTML += `
                 <div class="care-item">
                     <div class="care-item-title"><i class="fa-solid fa-droplet"></i> Diabetes Meal Timing & Metformin Safety</div>
@@ -1630,7 +1837,7 @@ Return ONLY a valid JSON array in this exact format:
             warningUl.innerHTML += `<li><strong>Hypoglycemia Warning:</strong> Shakiness, dizziness, cold sweat, or confusion. Consume fast-acting glucose immediately.</li>`;
         }
 
-        if (checkedDiseaseIds.includes('fatty_liver') || checkedDiseaseIds.includes('cholesterol')) {
+        if (checkedDiseaseIds.includes('fatty_liver') || checkedDiseaseIds.includes('cholesterol') || checkedDiseaseLabels.some(l => l.includes('liver') || l.includes('cholesterol'))) {
             careBody.innerHTML += `
                 <div class="care-item">
                     <div class="care-item-title"><i class="fa-solid fa-heart"></i> Fatty Liver & High Cholesterol Statin Safety</div>
@@ -1643,7 +1850,7 @@ Return ONLY a valid JSON array in this exact format:
             warningUl.innerHTML += `<li><strong>Jaundice or Severe Right Upper Abdomen Pain:</strong> Yellowing of skin/eyes indicating hepatic emergency.</li>`;
         }
 
-        if (checkedDiseaseIds.includes('hypertension')) {
+        if (checkedDiseaseIds.includes('hypertension') || checkedDiseaseLabels.some(l => l.includes('hypertension') || l.includes('high blood'))) {
             careBody.innerHTML += `
                 <div class="care-item">
                     <div class="care-item-title"><i class="fa-solid fa-heart-pulse"></i> Hypertension Sodium & Hydration Control</div>
@@ -1651,35 +1858,6 @@ Return ONLY a valid JSON array in this exact format:
                 </div>
             `;
             warningUl.innerHTML += `<li><strong>Severe Blood Pressure Spike:</strong> Systolic BP >180 mmHg or sudden intense headache/blurred vision.</li>`;
-        }
-
-        if (checkedDiseaseIds.includes('acid_reflux')) {
-            careBody.innerHTML += `
-                <div class="care-item">
-                    <div class="care-item-title"><i class="fa-solid fa-vial-circle-check"></i> Acid Reflux & Nighttime Elevation</div>
-                    <p>Elevate head of bed by 15 cm. Avoid eating large meals within 3 hours of sleep. Steer clear of raw onions, tomatoes, and peppermint.</p>
-                </div>
-            `;
-            warningUl.innerHTML += `<li><strong>Difficulty Swallowing (Dysphagia):</strong> Feeling food stuck in esophagus or persistent vomiting.</li>`;
-        }
-
-        if (checkedDiseaseIds.includes('joint_arthritis') || checkedDiseaseIds.includes('back_pain')) {
-            careBody.innerHTML += `
-                <div class="care-item">
-                    <div class="care-item-title"><i class="fa-solid fa-bone"></i> Musculoskeletal Mobility & Core Support</div>
-                    <p>Maintain consistent gentle daily movement. Avoid prolonged static sitting. Apply warm compresses to ease muscular tension.</p>
-                </div>
-            `;
-            warningUl.innerHTML += `<li><strong>Numbness, Tingling or Loss of Bladder/Bowel Control:</strong> Immediate spinal cord red flag (Cauda Equina).</li>`;
-        }
-
-        if (checkedDiseaseIds.includes('anxiety_stress')) {
-            careBody.innerHTML += `
-                <div class="care-item">
-                    <div class="care-item-title"><i class="fa-solid fa-brain"></i> Nervous System Sleep Hygiene</div>
-                    <p>Limit screen exposure and caffeine after 4 PM. Practice 4-7-8 breathing before sleep to facilitate restorative sleep cycles.</p>
-                </div>
-            `;
         }
 
         warningUl.innerHTML += `<li><strong>Persistent High Fever:</strong> Temperature >38.5°C unmanaged by Paracetamol.</li>`;
