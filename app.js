@@ -364,44 +364,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------------------------
     // 3. Application State & Storage Initialization
-    // NEW USER -> Clean Empty Onboarding State
-    // EXISTING USER (You) -> Load Saved Profile Intact!
+    // EVERY NEW VISITOR (Incognito / New Device) STARTS COMPLETELY EMPTY!
     // ----------------------------------------------------------------------
-    const savedMedsStr = localStorage.getItem('medicare_medications_v7');
-    const savedDiseasesStr = localStorage.getItem('medicare_active_diseases_v7');
+    const savedMedsStr = localStorage.getItem('medicare_medications_v8');
+    const savedDiseasesStr = localStorage.getItem('medicare_active_diseases_v8');
 
-    let medications;
-    let activeDiseases;
+    let medications = [];
+    let activeDiseases = [
+        { id: 'pneumonia', label: 'Pneumonia / Chest Infection', icon: 'fa-lungs', checked: false, classTag: 'tag-pneumonia' },
+        { id: 'diabetes', label: 'Diabetes (Type 1 / 2)', icon: 'fa-droplet', checked: false, classTag: 'tag-diabetes' },
+        { id: 'fatty_liver', label: 'Fatty Liver (NAFLD)', icon: 'fa-disease', checked: false, classTag: 'tag-liver' },
+        { id: 'cholesterol', label: 'High Cholesterol', icon: 'fa-heart', checked: false, classTag: 'tag-cholesterol' },
+        { id: 'hypertension', label: 'Hypertension', icon: 'fa-heart-pulse', checked: false, classTag: 'tag-hypertension' },
+        { id: 'acid_reflux', label: 'Acid Reflux / Gastritis', icon: 'fa-vial-circle-check', checked: false, classTag: '' },
+        { id: 'back_pain', label: 'Lower Back Pain', icon: 'fa-child', checked: false, classTag: '' },
+        { id: 'joint_arthritis', label: 'Joint Arthritis', icon: 'fa-bone', checked: false, classTag: '' },
+        { id: 'anxiety_stress', label: 'Anxiety & Stress', icon: 'fa-brain', checked: false, classTag: '' }
+    ];
 
     if (savedMedsStr && savedDiseasesStr) {
-        // EXISTING USER (You): Load saved profile intact
+        // If the user has saved their state on this device/browser:
         medications = JSON.parse(savedMedsStr);
         activeDiseases = JSON.parse(savedDiseasesStr);
-    } else {
-        // NEW USER: Start clean with onboarding instruction view!
-        medications = [];
-        activeDiseases = [
-            { id: 'pneumonia', label: 'Pneumonia / Chest Infection', icon: 'fa-lungs', checked: false, classTag: 'tag-pneumonia' },
-            { id: 'diabetes', label: 'Diabetes (Type 1 / 2)', icon: 'fa-droplet', checked: false, classTag: 'tag-diabetes' },
-            { id: 'fatty_liver', label: 'Fatty Liver (NAFLD)', icon: 'fa-disease', checked: false, classTag: 'tag-liver' },
-            { id: 'cholesterol', label: 'High Cholesterol', icon: 'fa-heart', checked: false, classTag: 'tag-cholesterol' },
-            { id: 'hypertension', label: 'Hypertension', icon: 'fa-heart-pulse', checked: false, classTag: 'tag-hypertension' },
-            { id: 'acid_reflux', label: 'Acid Reflux / Gastritis', icon: 'fa-vial-circle-check', checked: false, classTag: '' },
-            { id: 'back_pain', label: 'Lower Back Pain', icon: 'fa-child', checked: false, classTag: '' },
-            { id: 'joint_arthritis', label: 'Joint Arthritis', icon: 'fa-bone', checked: false, classTag: '' },
-            { id: 'anxiety_stress', label: 'Anxiety & Stress', icon: 'fa-brain', checked: false, classTag: '' }
-        ];
-
-        // Seed default profile for the author's initial session
-        if (!localStorage.getItem('medicare_has_visited')) {
-            medications = [...PROFILE_PNEUMONIA, ...PROFILE_METABOLIC];
-            activeDiseases.forEach(d => {
-                if (['pneumonia', 'diabetes', 'fatty_liver', 'cholesterol'].includes(d.id)) {
-                    d.checked = true;
-                }
-            });
-            localStorage.setItem('medicare_has_visited', 'true');
-        }
     }
 
     let doseLogs = JSON.parse(localStorage.getItem('medicare_dose_logs')) || {};
@@ -924,9 +908,9 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
     });
 
     function saveState() {
-        localStorage.setItem('medicare_medications_v7', JSON.stringify(medications));
+        localStorage.setItem('medicare_medications_v8', JSON.stringify(medications));
         localStorage.setItem('medicare_dose_logs', JSON.stringify(doseLogs));
-        localStorage.setItem('medicare_active_diseases_v7', JSON.stringify(activeDiseases));
+        localStorage.setItem('medicare_active_diseases_v8', JSON.stringify(activeDiseases));
     }
 
     function updateAllViews() {
@@ -991,7 +975,7 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
                     </p>
                     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                         <button onclick="document.querySelector('[data-tab=\\'tab-add\\']').click()" class="btn btn-primary"><i class="fa-solid fa-plus-circle"></i> Add Your Medication</button>
-                        <button id="onboarding-load-presets" class="btn btn-outline"><i class="fa-solid fa-file-prescription"></i> Load Prescriptions</button>
+                        <button id="onboarding-load-presets" class="btn btn-outline"><i class="fa-solid fa-file-prescription"></i> Load Pneumonia & Metabolic Prescriptions</button>
                     </div>
                 </div>
             `;
