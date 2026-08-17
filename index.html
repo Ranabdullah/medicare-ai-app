@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Multi-Disease Medication Schedule & Gemini AI Healthcare Companion</title>
+    <meta name="description" content="Manage multi-disease medication schedules for Ireland (HPRA POM vs OTC). Powered by Gemini AI for personalized care plans, exercise guides, and verified PubMed research citations.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header / Brand Banner -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div>
+                    <h1>MediCare AI Companion (Ireland HPRA Edition)</h1>
+                    <p class="subtitle">Ireland Rx & OTC Classification • Multi-Disease Auto-Schedule • Gemini AI Doctor</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="dropdown-wrapper">
+                    <button id="btn-preload-menu" class="btn btn-outline" title="Load Prescription Profiles">
+                        <i class="fa-solid fa-file-prescription"></i> Load Prescriptions <i class="fa-solid fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="preload-dropdown">
+                        <a href="#" id="load-rx-pneumonia"><i class="fa-solid fa-lungs"></i> Pneumonia Rx (Amoclav, Clarithromycin)</a>
+                        <a href="#" id="load-rx-metabolic"><i class="fa-solid fa-notes-medical"></i> Diabetes + Fatty Liver + Cholesterol Profile</a>
+                        <a href="#" id="load-rx-all"><i class="fa-solid fa-cubes"></i> Multi-Condition Full Profile</a>
+                    </div>
+                </div>
+                <button id="btn-export-pdf" class="btn btn-outline" title="Print or Export Schedule">
+                    <i class="fa-solid fa-print"></i> Print / Export
+                </button>
+                <button id="btn-toggle-theme" class="btn btn-icon" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MULTI-DISEASE PATIENT HEALTH PROFILE & CUSTOM DISEASE ADD/REMOVE -->
+        <section class="card profile-selector-card">
+            <div class="profile-card-header">
+                <div>
+                    <h3><i class="fa-solid fa-user-doctor" style="color:var(--primary-color);"></i> Patient Health Profile — Select & Manage Your Diseases</h3>
+                    <p class="text-muted">Selecting or unselecting a disease automatically adjusts your medications, exercises, home remedies, and care guidelines!</p>
+                </div>
+                <div class="profile-header-btns">
+                    <button id="btn-select-all-diseases" class="btn btn-outline btn-sm">
+                        <i class="fa-solid fa-check-double"></i> Select All Active
+                    </button>
+                </div>
+            </div>
+
+            <!-- Checkbox Grid for Diseases with Remove 'x' Buttons -->
+            <div class="conditions-checkbox-grid" id="conditions-checkbox-grid">
+                <!-- Dynamic disease pills populated by JS -->
+            </div>
+
+            <!-- Add Custom Disease Input Row -->
+            <div class="add-disease-row">
+                <input type="text" id="custom-disease-input" placeholder="Enter new disease (e.g. Asthma, Thyroid, Eczema, Migraine)..." autocomplete="off">
+                <button id="btn-add-custom-disease" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus"></i> Add Disease
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="app-nav">
+            <button class="nav-tab active" data-tab="tab-schedule">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Daily Schedule</span>
+                <span class="badge" id="dose-badge">0</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-ai-consultant">
+                <i class="fa-solid fa-robot"></i>
+                <span>Gemini AI Doctor</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-add">
+                <i class="fa-solid fa-pills"></i>
+                <span>Add Medication</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-exercises">
+                <i class="fa-solid fa-person-walking-stretch"></i>
+                <span>Recommended Exercises</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-remedies">
+                <i class="fa-solid fa-leaf"></i>
+                <span>Home Remedies</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-care">
+                <i class="fa-solid fa-shield-heart"></i>
+                <span>Care & Safety</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="app-content">
+
+            <!-- TAB 1: DAILY SCHEDULE & TRACKER -->
+            <section id="tab-schedule" class="tab-panel active">
+                <div class="panel-header">
+                    <div>
+                        <h2>Today's Medication Timeline</h2>
+                        <p class="text-muted" id="current-date-str">Loading date...</p>
+                    </div>
+                    <div class="schedule-summary-cards">
+                        <div class="mini-card">
+                            <span class="mini-card-val" id="stat-total">0</span>
+                            <span class="mini-card-lbl">Total Doses</span>
+                        </div>
+                        <div class="mini-card highlight-success">
+                            <span class="mini-card-val" id="stat-taken">0</span>
+                            <span class="mini-card-lbl">Taken</span>
+                        </div>
+                        <div class="mini-card highlight-warning">
+                            <span class="mini-card-val" id="stat-pending">0</span>
+                            <span class="mini-card-lbl">Remaining</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ireland HPRA Regulatory Legend Banner -->
+                <div class="hpra-legend-bar">
+                    <span><strong><i class="fa-solid fa-flag"></i> Ireland Pharmacy Classification:</strong></span>
+                    <span class="hpra-badge pom-badge"><i class="fa-solid fa-lock"></i> Prescription Only (POM - Doctor Required in Ireland)</span>
+                    <span class="hpra-badge otc-badge"><i class="fa-solid fa-cart-shopping"></i> Over-The-Counter (OTC Pharmacy - Buy Locally in Ireland)</span>
+                </div>
+
+                <!-- Next Reminder Alert Box -->
+                <div class="next-dose-banner" id="next-dose-banner">
+                    <div class="banner-icon"><i class="fa-solid fa-bell"></i></div>
+                    <div class="banner-info">
+                        <span class="banner-tag">NEXT UPCOMING DOSE</span>
+                        <h3 id="next-dose-title">No doses remaining for today</h3>
+                        <p id="next-dose-time">Enjoy your day!</p>
+                    </div>
+                    <div class="banner-timer" id="next-dose-timer">--:--</div>
+                </div>
+
+                <!-- Timeline List -->
+                <div class="timeline-container" id="timeline-container">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </section>
+
+            <!-- TAB 2: GEMINI AI DOCTOR & MULTI-DISEASE CONSULTANT -->
+            <section id="tab-ai-consultant" class="tab-panel">
+                <div class="card ai-card">
+                    <div class="ai-header">
+                        <div class="ai-title-badge">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <div>
+                                <h2>Gemini AI Multi-Disease Health Consultant</h2>
+                                <p class="subtitle">Personalized AI analysis for your combined health conditions & Irish medication guidance</p>
+                            </div>
+                        </div>
+                        <button id="btn-generate-ai-plan" class="btn btn-primary">
+                            <i class="fa-solid fa-brain"></i> Generate AI Multi-Disease Plan
+                        </button>
+                    </div>
+
+                    <!-- Multi-Disease Active Summary -->
+                    <div class="multi-disease-tags-box" id="active-conditions-summary">
+                        <strong>Active Selected Conditions:</strong>
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <!-- AI Response Area -->
+                    <div class="ai-output-box" id="ai-output-box">
+                        <div class="ai-welcome-msg">
+                            <i class="fa-solid fa-user-doctor" style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 12px;"></i>
+                            <h3>Ask Gemini AI about your Medications & Selected Health Conditions</h3>
+                            <p class="text-muted">Click <strong>"Generate AI Multi-Disease Plan"</strong> above to receive customized dietary advice, drug interaction alerts, and physical care guidelines tailored for your specific selected conditions.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Ask AI Input Box -->
+                    <div class="ai-chat-input-wrapper">
+                        <input type="text" id="ai-user-query" placeholder="Ask AI a question e.g. Which medicines can I buy OTC in Ireland vs Doctor Rx?..." autocomplete="off">
+                        <button id="btn-ask-ai" class="btn btn-primary">
+                            <i class="fa-solid fa-paper-plane"></i> Ask AI
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: ADD MEDICATION & ONLINE SEARCH -->
+            <section id="tab-add" class="tab-panel">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-prescription-bottle-medical"></i> Add New Medication</h2>
+                        <p class="text-muted">Type any medication name. Auto-searches live NIH RxNav API & Irish pharmacy classification (POM vs OTC).</p>
+                    </div>
+
+                    <form id="medication-form">
+                        <!-- Medicine Name with Search -->
+                        <div class="form-group search-group">
+                            <label for="med-name"><i class="fa-solid fa-magnifying-glass"></i> Medicine Name (Auto Online Search)</label>
+                            <div class="input-with-spinner">
+                                <input type="text" id="med-name" placeholder="e.g. Paralief Paracetamol, Amoclav, Metformin, Atorvastatin, Clarithromycin..." autocomplete="off" required>
+                                <span class="search-spinner" id="search-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                            </div>
+                            <div class="autocomplete-dropdown" id="autocomplete-results"></div>
+                        </div>
+
+                        <!-- Live Medical API Info Preview Badge -->
+                        <div class="api-info-badge" id="api-info-badge" style="display: none;">
+                            <div class="api-badge-header">
+                                <span class="badge-tag"><i class="fa-solid fa-circle-check"></i> Verified Drug Profile</span>
+                                <span class="api-rxnorm-id" id="rxnorm-id">RxCUI: --</span>
+                            </div>
+                            <div class="api-details">
+                                <p><strong>Ireland HPRA Classification:</strong> <span id="api-ireland-status" class="hpra-badge">--</span></p>
+                                <p><strong>Active Ingredient:</strong> <span id="api-ingredient">--</span></p>
+                                <p><strong>Therapeutic Class / Purpose:</strong> <span id="api-purpose">--</span></p>
+                                <p><strong>Food & Drug Interaction Alert:</strong> <span id="api-interactions">--</span></p>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <!-- Dosage Input -->
+                            <div class="form-group">
+                                <label for="med-dosage"><i class="fa-solid fa-vial"></i> Dosage / Strength</label>
+                                <input type="text" id="med-dosage" placeholder="e.g. 500mg, 500mg/125mg, 20mg" required>
+                            </div>
+
+                            <!-- Primary Health Condition Select -->
+                            <div class="form-group">
+                                <label for="med-condition"><i class="fa-solid fa-stethoscope"></i> Target Disease / Health Condition</label>
+                                <select id="med-condition" required>
+                                    <!-- Populated dynamically from active diseases -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <!-- Daily Frequency -->
+                            <div class="form-group">
+                                <label for="med-frequency"><i class="fa-solid fa-clock"></i> Daily Frequency</label>
+                                <select id="med-frequency" required>
+                                    <option value="1">1 time a day (Every 24 hrs)</option>
+                                    <option value="2" selected>2 times a day (Every 12 hrs)</option>
+                                    <option value="3">3 times a day (Every 8 hrs)</option>
+                                    <option value="4">4 times a day (Every 6 hrs)</option>
+                                </select>
+                            </div>
+
+                            <!-- Ireland Availability Status -->
+                            <div class="form-group">
+                                <label for="med-ireland-type"><i class="fa-solid fa-flag"></i> Ireland Availability Status</label>
+                                <select id="med-ireland-type" required>
+                                    <option value="POM">Prescription Only (POM - Doctor Required in Ireland)</option>
+                                    <option value="OTC">Over-The-Counter (OTC Pharmacy - Buy Locally in Ireland)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Relation to Food & Water Intake -->
+                        <div class="form-group">
+                            <label for="med-food"><i class="fa-solid fa-glass-water"></i> Relation to Meals & Water</label>
+                            <select id="med-food">
+                                <option value="after_water">After food with plenty of water</option>
+                                <option value="plenty_water">With plenty of water (Swallow whole)</option>
+                                <option value="with_food_water">With meals & water</option>
+                                <option value="before_water">Before meals with water (30 mins prior)</option>
+                                <option value="empty_water">On empty stomach with plenty of water</option>
+                            </select>
+                        </div>
+
+                        <!-- Auto-Generated Times Preview -->
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-regular fa-clock"></i> Intake Schedule Times (Editable):</label>
+                            <div class="generated-times-container" id="generated-times-container">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Special Care Instructions -->
+                        <div class="form-group">
+                            <label for="med-notes"><i class="fa-solid fa-note-sticky"></i> Doctor / Pharmacy Prescription Notes</label>
+                            <textarea id="med-notes" rows="2" placeholder="e.g. Space doses evenly throughout the day. Take with plenty of water..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-plus-circle"></i> Save Medication & Update Schedule
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 4: CONDITION EXERCISES & VISUAL GUIDES -->
+            <section id="tab-exercises" class="tab-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2><i class="fa-solid fa-person-walking-stretch"></i> Recommended Exercises</h2>
+                        <p class="text-muted">Evidence-based physical exercises matched to your selected conditions with PubMed citations.</p>
+                    </div>
+                    <div class="filter-box">
+                        <label for="exercise-condition-filter">Filter View:</label>
+                        <select id="exercise-condition-filter">
+                            <option value="my_diseases">✨ Show Exercises For My Selected Diseases</option>
+                            <option value="all">Show All Exercises</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="exercise-grid" id="exercise-grid">
+                    <!-- Dynamic exercise cards populated by JS -->
+                </div>
+            </section>
+
+            <!-- TAB 5: HOME REMEDIES & RESEARCH CITATIONS -->
+            <section id="tab-remedies" class="tab-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2><i class="fa-solid fa-leaf"></i> Evidence-Informed Home Remedies</h2>
+                        <p class="text-muted">Safe, natural remedies supported by peer-reviewed research papers (NCBI, PubMed & NIH citations) tailored to your conditions.</p>
+                    </div>
+                    <div class="filter-box">
+                        <label for="remedy-condition-filter">Filter View:</label>
+                        <select id="remedy-condition-filter">
+                            <option value="my_diseases">✨ Show Home Remedies For My Selected Diseases</option>
+                            <option value="all">Show All Home Remedies</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="remedies-grid" id="remedies-grid">
+                    <!-- Dynamic remedies populated by JS -->
+                </div>
+            </section>
+
+            <!-- TAB 6: CARE & SAFETY GUIDELINES -->
+            <section id="tab-care" class="tab-panel">
+                <div class="care-container">
+                    <div class="card care-card">
+                        <div class="care-card-header text-danger">
+                            <i class="fa-solid fa-shield-virus"></i>
+                            <h3>Multi-Disease Care & Drug Safety Guidelines (Ireland HPRA)</h3>
+                        </div>
+                        <div class="care-body" id="dynamic-care-body">
+                            <!-- Populated dynamically based on selected diseases -->
+                        </div>
+                    </div>
+
+                    <div class="card care-card">
+                        <div class="care-card-header text-warning">
+                            <i class="fa-solid fa-hospital-user"></i>
+                            <h3>When to Seek Immediate Medical Attention in Ireland</h3>
+                        </div>
+                        <div class="care-body" id="dynamic-warning-body">
+                            <!-- Populated dynamically based on selected diseases -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Audio Beep sound for dose alert -->
+    <audio id="alert-sound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="app.js"></script>
+</body>
+</html>
