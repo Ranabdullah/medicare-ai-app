@@ -207,37 +207,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    // Peer-Reviewed Research Exercises Data
+    // Comprehensive Evidence-Based Scientific Research Exercises for ALL Diseases
     const RESEARCH_EXERCISES = [
         {
             id: "ex_deep_breathing_pneu",
             title: "Deep Diaphragmatic Breathing & Lung Expansion",
             condition: "pneumonia",
-            conditionTag: "Pneumonia & Lung Recovery",
+            conditionTag: "Pneumonia & Chest Recovery",
             duration: "5-10 mins / 3 times daily",
             img: "assets/exercise_deep_breathing.jpg",
-            desc: "Pneumonia causes alveolar congestion. Deep breathing opens collapsed air sacs, improves oxygen saturation, and aids mucus clearance.",
+            desc: "Pneumonia causes alveolar congestion. Deep diaphragmatic breathing opens collapsed air sacs, increases tidal volume, and assists mucus clearance.",
             instructions: [
-                "Sit upright in a chair with back supported.",
-                "Inhale slowly through nose for 4 seconds, expand belly.",
-                "Hold breath for 2 seconds, exhale through pursed lips for 6 seconds.",
-                "Perform 10 cycles followed by gentle huff coughing."
+                "Sit upright in a comfortable chair with back supported.",
+                "Inhale slowly through your nose for 4 seconds, feeling your belly expand.",
+                "Hold breath gently for 2 seconds, then exhale through pursed lips for 6 seconds.",
+                "Perform 10 cycles followed by 2 gentle huff coughs."
             ],
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/31383216/",
-            pubMedTitle: "PubMed: Respiratory Exercises in Community-Acquired Pneumonia"
+            pubMedTitle: "PubMed: Respiratory Rehabilitation in Community-Acquired Pneumonia"
         },
         {
             id: "ex_fatty_liver_cardio",
-            title: "Zone 2 Aerobic Exercise & Lipid Clearance",
+            title: "Zone 2 Moderate Aerobic Exercise",
             condition: "fatty_liver",
-            conditionTag: "Fatty Liver & High Cholesterol",
+            conditionTag: "Fatty Liver (NAFLD)",
             duration: "30 mins / 4-5 days a week",
             img: "assets/exercise_walking_cardio.jpg",
-            desc: "Zone 2 aerobic exercise enhances mitochondrial beta-oxidation in hepatocytes, significantly reducing intrahepatic lipid content and serum LDL cholesterol.",
+            desc: "Zone 2 aerobic exercise enhances mitochondrial beta-oxidation in hepatocytes, significantly decreasing intrahepatic triglyceride content.",
             instructions: [
-                "Brisk walking, cycling, or swimming at 60-70% max heart rate.",
-                "Maintain a rhythm where you can speak in full sentences but feel mild warmth.",
-                "Accumulate at least 150 minutes per week for hepatic fat reduction."
+                "Brisk walking, stationary cycling, or swimming at a steady, conversational pace.",
+                "Maintain heart rate at ~60-70% of maximum.",
+                "Target at least 150 minutes of accumulated activity per week."
             ],
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/34320921/",
             pubMedTitle: "PubMed: Exercise Interventions in Non-Alcoholic Fatty Liver Disease (NAFLD)"
@@ -246,119 +246,229 @@ document.addEventListener('DOMContentLoaded', () => {
             id: "ex_postprandial_walk",
             title: "Post-Meal 15-Minute Glucose Walk",
             condition: "diabetes",
-            conditionTag: "Diabetes & Blood Sugar Control",
+            conditionTag: "Diabetes & Glycemic Control",
             duration: "15 mins / after main meals",
             img: "assets/exercise_knee_stretch.jpg",
-            desc: "Light physical activity within 30 minutes post-meal stimulates GLUT4 glucose translocation in skeletal muscle, blunting postprandial glucose spikes.",
+            desc: "Light physical activity within 30 minutes post-meal stimulates GLUT4 glucose transporter translocation in skeletal muscles, blunting postprandial glucose spikes.",
             instructions: [
-                "Begin walking 15-20 minutes after completing your main meal.",
-                "Walk at a moderate steady pace for 15 minutes.",
-                "Repeat after lunch and dinner for optimal 24-hour glycemic stability."
+                "Begin walking 15-20 minutes after finishing lunch or dinner.",
+                "Walk at a moderate steady pace without excessive exertion.",
+                "Consistently performing this reduces 24-hour glycemic variability."
             ],
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/33454378/",
             pubMedTitle: "PubMed: Post-Meal Walking Efficacy in Type 2 Diabetes Management"
         },
         {
-            id: "ex_walking",
-            title: "Gentle Aerobic Walking Cardio",
-            condition: "hypertension",
-            conditionTag: "Hypertension & Heart Health",
-            duration: "20-30 mins / daily",
+            id: "ex_cholesterol_hiit",
+            title: "Interval Cardio for Lipid & LDL Clearance",
+            condition: "cholesterol",
+            conditionTag: "High Cholesterol & Lipids",
+            duration: "25 mins / 3 times weekly",
             img: "assets/exercise_walking_cardio.jpg",
-            desc: "Regular brisk walking lowers systolic blood pressure by improving vascular elasticity and endothelial function.",
+            desc: "Moderate interval training upregulates hepatic LDL receptor expression, boosting reverse cholesterol transport and increasing cardio-protective HDL.",
             instructions: [
-                "Maintain an upright posture with shoulders relaxed.",
-                "Walk at a comfortable pace where you can still converse without gasping.",
-                "Aim for 150 minutes per week divided over 5 days."
+                "Warm up with 5 minutes of light walking.",
+                "Alternate 2 minutes of brisk uphill walking with 2 minutes of relaxed walking.",
+                "Repeat 5 cycles and cool down."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/24174305/",
+            pubMedTitle: "PubMed: Exercise Effects on Blood Lipids & Reverse Cholesterol Transport"
+        },
+        {
+            id: "ex_walking_hypertension",
+            title: "Aerobic Walking & Endothelial Conditioning",
+            condition: "hypertension",
+            conditionTag: "Hypertension & Blood Pressure",
+            duration: "30 mins / daily",
+            img: "assets/exercise_walking_cardio.jpg",
+            desc: "Regular brisk walking enhances nitric oxide bioavailability and reduces peripheral vascular resistance, lowering resting systolic and diastolic blood pressure.",
+            instructions: [
+                "Maintain an upright, relaxed posture with rhythmic arm swings.",
+                "Maintain a brisk walking pace where you can converse comfortably.",
+                "Aim for 30 minutes daily, preferably in the morning or early evening."
             ],
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/40910800/",
-            pubMedTitle: "PubMed: Effects of Exercise Training on Blood Pressure"
+            pubMedTitle: "PubMed: Aerobic Training Effects on Blood Pressure Regulation"
+        },
+        {
+            id: "ex_acid_reflux_breathing",
+            title: "Upright Diaphragmatic Breath & Posture Align",
+            condition: "acid_reflux",
+            conditionTag: "Acid Reflux & Gastritis",
+            duration: "10 mins / after meals",
+            img: "assets/exercise_deep_breathing.jpg",
+            desc: "Strengthening the lower esophageal sphincter (crural diaphragm) via diaphragmatic breathing helps prevent acid regurgitation into the esophagus.",
+            instructions: [
+                "Sit tall with your spine erect; avoid lying down for 2 hours after meals.",
+                "Place one hand on upper abdomen and breathe slowly from the diaphragm.",
+                "Take 10 deep breaths to reinforce lower esophageal sphincter tone."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/22146488/",
+            pubMedTitle: "PubMed: Diaphragmatic Breathing Decreases Reflux in Patients with GERD"
         },
         {
             id: "ex_cat_cow",
-            title: "Cat-Cow Spinal Flexibility Stretch",
+            title: "Cat-Cow Spinal Mobility & Lumbar Decompression",
             condition: "back_pain",
             conditionTag: "Lower Back Pain & Spine",
-            duration: "2-3 sets of 10 flexions",
+            duration: "3 sets of 10 flexions",
             img: "assets/exercise_back_stretch.jpg",
-            desc: "Gentle spinal mobilization improves intervertebral fluid flow and relieves lumbar stiffness.",
+            desc: "Gentle spinal mobilization improves intervertebral fluid circulation, activates the multifidus, and relieves lumbar stiffness.",
             instructions: [
-                "Start on hands and knees (tabletop position).",
-                "Inhale: Arch back gently, lift chest (Cow Pose).",
-                "Exhale: Round spine upward, tuck chin (Cat Pose)."
+                "Start on hands and knees with wrists under shoulders and knees under hips.",
+                "Inhale: Arch back gently, lift chest toward ceiling (Cow Pose).",
+                "Exhale: Round spine upward toward ceiling, tuck chin to chest (Cat Pose)."
             ],
             pubMedLink: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6600209/",
             pubMedTitle: "NCBI PMC: Yoga & Spinal Mobilization for Chronic Low Back Pain"
+        },
+        {
+            id: "ex_knee_joint_extension",
+            title: "Seated Isometric Quadriceps Strengthening",
+            condition: "joint_arthritis",
+            conditionTag: "Joint Arthritis & Knee Health",
+            duration: "3 sets of 12 reps / daily",
+            img: "assets/exercise_knee_stretch.jpg",
+            desc: "Strengthening the quadriceps offloads compressive stress from the knee joint capsule, reducing osteoarthritic cartilage wear and pain.",
+            instructions: [
+                "Sit upright in a firm chair with feet flat on the ground.",
+                "Slowly extend one leg forward until knee is straight; hold for 3 seconds.",
+                "Lower foot slowly back to floor. Repeat 12 times per leg."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/25442878/",
+            pubMedTitle: "PubMed: Quadriceps Strength and Joint Protection in Knee Osteoarthritis"
+        },
+        {
+            id: "ex_vagus_nerve_calm",
+            title: "4-7-8 Parasympathetic Vagus Nerve Relaxation",
+            condition: "anxiety_stress",
+            conditionTag: "Anxiety, Stress & Sleep",
+            duration: "5 mins / before sleep & when stressed",
+            img: "assets/exercise_deep_breathing.jpg",
+            desc: "Prolonged exhalation activates the parasympathetic nervous system via the vagus nerve, reducing serum cortisol and calming racing thoughts.",
+            instructions: [
+                "Inhale quietly through the nose for a count of 4.",
+                "Hold breath comfortably for a count of 7.",
+                "Exhale audibly and completely through the mouth for a count of 8.",
+                "Repeat for 4 full breath cycles."
+            ],
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/30153464/",
+            pubMedTitle: "PubMed: Breathwork Practices for Autonomic Nervous System Regulation"
         }
     ];
 
-    // Evidence-Based Home Remedies Data
+    // Comprehensive Evidence-Based Home Remedies for ALL Diseases
     const HOME_REMEDIES = [
         {
             id: "rem_honey_lemon",
-            title: "Pure Raw Honey & Warm Fluids for Pneumonia Cough",
+            title: "Pure Raw Honey & Warm Fluids for Cough",
             condition: "pneumonia",
             prepTime: "5 mins",
-            ingredients: "1 tbsp raw honey, 1/2 lemon in warm water or herbal tea.",
-            desc: "Honey acts as a natural pharyngeal demulcent, soothing throat irritation and reducing cough frequency in acute respiratory infections.",
-            usage: "Sip warm 2 to 3 times daily. (Do not give honey to infants under 1 yr).",
+            ingredients: "1 tbsp pure raw honey, 1/2 fresh lemon juice, 250ml warm water.",
+            desc: "Honey acts as a natural pharyngeal demulcent, forming a protective soothing film over irritated throat mucous membranes and reducing cough spasms.",
+            usage: "Sip warm 2 to 3 times daily. (Do not give honey to infants under 1 year).",
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/32817300/",
             pubMedTitle: "PubMed: Effectiveness of Honey for Upper Respiratory Infection Symptoms"
         },
         {
             id: "rem_steam_inhalation",
-            title: "Steam Humidification & Eucalyptus Inhalation",
+            title: "Warm Steam Inhalation with Eucalyptus",
             condition: "pneumonia",
             prepTime: "10 mins",
-            ingredients: "Bowl of hot steaming water, towel, optional drop of pure eucalyptus oil.",
-            desc: "Inhaling moist warm steam thins viscous bronchial mucus in pneumonia, relieving airways congestion and facilitating expectoration.",
+            ingredients: "Bowl of hot steaming water, towel, optional 1-2 drops pure eucalyptus oil.",
+            desc: "Warm steam humidification thins viscous pulmonary secretions in pneumonia and bronchitis, aiding productive bronchial clearance.",
             usage: "Lean over steam bowl with head covered by towel for 8-10 minutes, twice daily.",
             pubMedLink: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8141381/",
-            pubMedTitle: "NCBI PMC: Warm Steam Humidification in Airway Mucus Clearance"
+            pubMedTitle: "NCBI PMC: Steam Humidification in Airway Mucus Clearance"
         },
         {
             id: "rem_milk_thistle",
-            title: "Silymarin Milk Thistle & Green Tea Infusion",
+            title: "Standardized Silymarin Milk Thistle Extract & Green Tea",
             condition: "fatty_liver",
-            prepTime: "8 mins",
-            ingredients: "Standardized Milk Thistle extract / Green Tea (EGCG catechins).",
-            desc: "Silymarin acts as a potent hepatoprotective antioxidant, reducing lipid peroxidation, hepatic inflammation, and liver enzyme elevation (ALT/AST).",
-            usage: "Drink green tea 1-2 times daily; take standardized Milk Thistle extract with water.",
+            prepTime: "5 mins",
+            ingredients: "Standardized Milk Thistle extract (Silymarin) + Freshly brewed Green Tea (EGCG).",
+            desc: "Silymarin functions as a potent hepatoprotective antioxidant, suppressing hepatic lipid peroxidation and reducing elevated liver enzymes (ALT/AST).",
+            usage: "Drink green tea 1-2 times daily; take Silymarin extract with water.",
             pubMedLink: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7140766/",
-            pubMedTitle: "NCBI PMC7140766: Silymarin & Green Tea in Fatty Liver Disease Management"
+            pubMedTitle: "NCBI PMC7140766: Silymarin & Green Tea in Non-Alcoholic Fatty Liver Disease"
         },
         {
             id: "rem_psyllium_fiber",
             title: "Soluble Oat Beta-Glucan & Psyllium Husk Water",
             condition: "cholesterol",
             prepTime: "3 mins",
-            ingredients: "1 tablespoon soluble psyllium husk dissolved in 250ml warm water.",
-            desc: "Soluble viscous fiber binds to bile acids in the intestine, forcing the liver to consume circulating LDL cholesterol to synthesize new bile.",
-            usage: "Drink 15-20 minutes before lunch with a full extra glass of water.",
+            ingredients: "1 tbsp psyllium husk or oat beta-glucan in 250ml warm water.",
+            desc: "Soluble viscous fiber traps intestinal bile acids, forcing the liver to convert circulating serum LDL cholesterol into replacement bile.",
+            usage: "Drink 15 minutes before your main meal, followed by a full extra glass of water.",
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/24047686/",
             pubMedTitle: "PubMed: Lipid-Lowering Efficacy of Soluble Dietary Fiber Meta-Analysis"
         },
         {
-            id: "rem_cinnamon_tea",
-            title: "Ceylon Cinnamon Infusion for Glycemic Sensitivity",
+            id: "rem_cinnamon_fenugreek",
+            title: "Ceylon Cinnamon & Fenugreek Seed Infusion",
             condition: "diabetes",
-            prepTime: "5 mins",
-            ingredients: "1/2 tsp genuine Ceylon cinnamon powder in warm water.",
-            desc: "Cinnamon polyphenols mimic insulin activity and improve insulin receptor responsiveness, supporting glucose metabolism.",
-            usage: "Drink once daily with morning meal.",
+            prepTime: "8 mins",
+            ingredients: "1/2 tsp authentic Ceylon cinnamon + 1 tsp soaked fenugreek seeds in warm water.",
+            desc: "Cinnamon polyphenols and fenugreek 4-hydroxyisoleucine enhance insulin receptor sensitivity and slow intestinal carbohydrate absorption.",
+            usage: "Drink once daily with morning breakfast.",
             pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/24047686/",
-            pubMedTitle: "PubMed: Cinnamon Extract Efficacy in Type 2 Diabetes"
+            pubMedTitle: "PubMed: Cinnamon Extract Efficacy in Glycemic Control"
         },
         {
-            id: "rem_ginger",
-            title: "Fresh Ginger Infusion (Zingiber officinale)",
+            id: "rem_hibiscus_beetroot",
+            title: "Hibiscus Sabdariffa (Sour Tea) & Beetroot Juice",
+            condition: "hypertension",
+            prepTime: "5 mins",
+            ingredients: "Dried Hibiscus flowers steeped in hot water / 150ml fresh beetroot juice.",
+            desc: "Hibiscus calyces contain anthocyanins that act as natural ACE inhibitors, while beetroot nitrates convert into vascular nitric oxide.",
+            usage: "Drink 1 cup of unsweetened hibiscus tea daily.",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/25875025/",
+            pubMedTitle: "PubMed: Hibiscus Sabdariffa Efficacy on Blood Pressure: Systematic Review"
+        },
+        {
+            id: "rem_ginger_dgl",
+            title: "Fresh Ginger Root & Chamomile Gastric Soother",
             condition: "acid_reflux",
             prepTime: "10 mins",
-            ingredients: "Fresh ginger root slices (1-2g), warm water, optional raw honey.",
-            desc: "Gingerols accelerate gastric emptying and relieve stomach cramps and acid discomfort.",
-            usage: "Drink warm ginger tea 20 minutes before meals.",
+            ingredients: "Freshly sliced ginger root (1-2g), dried chamomile flowers in hot water.",
+            desc: "Gingerols accelerate gastric motility, while chamomile bisabolol reduces mucosal gastric inflammation and esophageal burning.",
+            usage: "Sip warm tea 20 minutes before meals.",
             pubMedLink: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7019938/",
-            pubMedTitle: "NCBI PMC7019938: Ginger on Human Health Systematic Review"
+            pubMedTitle: "NCBI PMC7019938: Ginger in Gastrointestinal Health Systematic Review"
+        },
+        {
+            id: "rem_turmeric_curcumin",
+            title: "Turmeric Curcumin & Black Pepper Golden Infusion",
+            condition: "back_pain",
+            conditionTag: "Lower Back Pain & Inflammation",
+            prepTime: "5 mins",
+            ingredients: "1/2 tsp turmeric powder (Curcumin), pinch of black pepper (Piperine), warm almond milk or water.",
+            desc: "Curcumin inhibits inflammatory cytokines (TNF-alpha, IL-6) and COX-2 enzymes, providing natural relief for musculoskeletal and lumbar discomfort.",
+            usage: "Drink warm once daily in the evening.",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/27533649/",
+            pubMedTitle: "PubMed: Curcumin Efficacy for Musculoskeletal Pain and Inflammation"
+        },
+        {
+            id: "rem_boswellia_flax",
+            title: "Boswellia Serrata & Ground Flaxseed Omega-3",
+            condition: "joint_arthritis",
+            prepTime: "3 mins",
+            ingredients: "1 tbsp ground golden flaxseed + Boswellia serrata extract in water or oats.",
+            desc: "Boswellic acids block 5-LOX inflammatory pathways, while ALA plant omega-3s decrease synovial joint stiffness and cartilage degradation.",
+            usage: "Incorporate into morning oatmeal or smoothie daily.",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/32680575/",
+            pubMedTitle: "PubMed: Boswellia Serrata Extract in Knee Osteoarthritis Management"
+        },
+        {
+            id: "rem_chamomile_ashwagandha",
+            title: "Pure Chamomile & Ashwagandha Root Elixir",
+            condition: "anxiety_stress",
+            prepTime: "8 mins",
+            ingredients: "Dried Matricaria chamomile blossoms + 300mg Ashwagandha (Withania somnifera) root in warm water.",
+            desc: "Chamomile apigenin binds to benzodiazepine receptors in the brain to promote relaxation, while Withanolides modulate cortisol synthesis in the HPA axis.",
+            usage: "Drink 45 minutes before bedtime.",
+            pubMedLink: "https://pubmed.ncbi.nlm.nih.gov/31517876/",
+            pubMedTitle: "PubMed: Ashwagandha Root Extract for Stress & Anxiety Reduction"
         }
     ];
 
@@ -596,26 +706,27 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="text-align: center; padding: 40px;">
                 <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 12px;"></i>
                 <h3>Consulting Gemini AI Doctor...</h3>
-                <p class="text-muted">Analyzing your medication profile & selected health conditions for Ireland HPRA compliance...</p>
+                <p class="text-muted">Analyzing your active conditions & medication schedule for personalized guidance...</p>
             </div>
         `;
 
         const checkedList = activeDiseases.filter(d => d.checked).map(d => d.label);
         const medListStr = medications.map(m => `- ${m.name} (${m.dosage}) [Ireland Status: ${m.irelandStatus || 'POM'}] for ${formatConditionName(m.condition)}, Frequency: ${m.frequency}x/day`).join('\n');
-        const activeConditionsStr = checkedList.join(', ');
+        const activeConditionsStr = checkedList.length > 0 ? checkedList.join(', ') : 'General Health Maintenance';
 
         const systemPrompt = `You are an expert Clinical Pharmacologist and Medical Health Assistant operating under Ireland Health Products Regulatory Authority (HPRA) standards.
 Patient Selected Health Conditions: ${activeConditionsStr}
 Current Medication Schedule:
-${medListStr}
+${medListStr || 'No medications currently scheduled.'}
 
 User Request/Query: ${userPrompt}
 
-Please provide a clear, professional, structured medical advice report addressing:
-1. **Ireland Pharmacy Status (POM vs OTC)**: Clarify which of their medications require a Doctor Prescription (POM) in Ireland vs which can be bought Over-The-Counter (OTC) at local Irish pharmacies.
-2. **Multi-Condition Care Strategy**: Dietary recommendations for their active conditions (${activeConditionsStr}).
-3. **8-Hour Dosing Rule**: Amoclav (3x daily) MUST be spaced 8 hours apart (06:00 AM, 02:00 PM, 10:00 PM) with water.
-4. **Physical Exercise & Safety Guidelines**.
+Please provide a clear, structured medical advice report addressing:
+1. **Ireland Pharmacy Status (POM vs OTC)**: Explain which medications require a Doctor Prescription (POM) in Ireland vs which are Over-The-Counter (OTC) in local pharmacies.
+2. **Targeted Care & Nutrition Strategy**: Specific diet, water hydration, and lifestyle guidelines for each selected condition (${activeConditionsStr}).
+3. **8-Hour Dosing Rule**: Highlight that 3-times daily medications (e.g. Amoclav) MUST be spaced EXACTLY 8 hours apart (06:00 AM, 02:00 PM, 10:00 PM) with water.
+4. **Evidence-Based Exercises & Home Remedies**: Specific physical exercises and natural home remedies for their active conditions.
+5. **Safety Warnings & Critical Red Flags**.
 
 Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
 
@@ -1295,6 +1406,45 @@ Format your response in clean HTML using <h3>, <ul>, <li>, and <strong> tags.`;
                 </div>
             `;
             warningUl.innerHTML += `<li><strong>Jaundice or Severe Right Upper Abdomen Pain:</strong> Yellowing of skin/eyes indicating hepatic emergency.</li>`;
+        }
+
+        if (checkedDiseaseIds.includes('hypertension')) {
+            careBody.innerHTML += `
+                <div class="care-item">
+                    <div class="care-item-title"><i class="fa-solid fa-heart-pulse"></i> Hypertension Sodium & Hydration Control</div>
+                    <p>Limit daily dietary sodium intake to under 2,000 mg. Avoid excessive licorice and energy drinks. Regularly monitor resting BP.</p>
+                </div>
+            `;
+            warningUl.innerHTML += `<li><strong>Severe Blood Pressure Spike:</strong> Systolic BP >180 mmHg or sudden intense headache/blurred vision.</li>`;
+        }
+
+        if (checkedDiseaseIds.includes('acid_reflux')) {
+            careBody.innerHTML += `
+                <div class="care-item">
+                    <div class="care-item-title"><i class="fa-solid fa-vial-circle-check"></i> Acid Reflux & Nighttime Elevation</div>
+                    <p>Elevate head of bed by 15 cm. Avoid eating large meals within 3 hours of sleep. Steer clear of raw onions, tomatoes, and peppermint.</p>
+                </div>
+            `;
+            warningUl.innerHTML += `<li><strong>Difficulty Swallowing (Dysphagia):</strong> Feeling food stuck in esophagus or persistent vomiting.</li>`;
+        }
+
+        if (checkedDiseaseIds.includes('joint_arthritis') || checkedDiseaseIds.includes('back_pain')) {
+            careBody.innerHTML += `
+                <div class="care-item">
+                    <div class="care-item-title"><i class="fa-solid fa-bone"></i> Musculoskeletal Mobility & Core Support</div>
+                    <p>Maintain consistent gentle daily movement. Avoid prolonged static sitting. Apply warm compresses to ease muscular tension.</p>
+                </div>
+            `;
+            warningUl.innerHTML += `<li><strong>Numbness, Tingling or Loss of Bladder/Bowel Control:</strong> Immediate spinal cord red flag (Cauda Equina).</li>`;
+        }
+
+        if (checkedDiseaseIds.includes('anxiety_stress')) {
+            careBody.innerHTML += `
+                <div class="care-item">
+                    <div class="care-item-title"><i class="fa-solid fa-brain"></i> Nervous System Sleep Hygiene</div>
+                    <p>Limit screen exposure and caffeine after 4 PM. Practice 4-7-8 breathing before sleep to facilitate restorative sleep cycles.</p>
+                </div>
+            `;
         }
 
         warningUl.innerHTML += `<li><strong>Persistent High Fever:</strong> Temperature >38.5°C unmanaged by Paracetamol.</li>`;
