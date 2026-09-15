@@ -1,0 +1,26 @@
+{
+  "name": "medicinescheduleapp",
+  "version": "1.0.0",
+  "description": "Run `node --env-file-if-exists=.env.local server.cjs` with Node 22 or later, then open http://127.0.0.1:4177.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env.local server.cjs",
+    "check": "node --check app.js && node --check health-library.js && node --check source-reader.cjs && node --check server.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ranabdullah/medicare-ai-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ranabdullah/medicare-ai-app/issues"
+  },
+  "homepage": "https://github.com/Ranabdullah/medicare-ai-app#readme",
+  "dependencies": {
+    "cheerio": "^1.2.0"
+  },
+  "private": true
+}

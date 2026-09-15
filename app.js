@@ -210,6 +210,9 @@ document.addEventListener('DOMContentLoaded', () => {
     medNameInput.addEventListener('input', () => {
         const query = medNameInput.value.trim().toLowerCase();
         clearTimeout(debounceTimer);
+        let advice=document.getElementById('medicine-practical-info');
+        if(!advice){advice=document.createElement('div');advice.id='medicine-practical-info';apiBadge.after(advice);}
+        advice.innerHTML=query.length>2?window.MedicineSafety.card({name:query}):'';
         apiBadge.style.display = 'none';
         document.getElementById('rxnorm-id').textContent = '';
         document.getElementById('api-ingredient').textContent = '';
@@ -312,6 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
         link.href = 'https://rxnav.nlm.nih.gov/REST/rxcui/' + encodeURIComponent(item.rxcui) + '/properties.json';
         link.target = '_blank'; link.rel = 'noopener noreferrer';
 
+        let advice=document.getElementById('medicine-practical-info');
+        if(!advice){advice=document.createElement('div');advice.id='medicine-practical-info';apiBadge.after(advice);}
+        advice.innerHTML=window.MedicineSafety.card(item);
         apiBadge.style.display = 'block';
 
         if (item.condition) {
@@ -391,7 +397,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ingredient: document.getElementById('api-ingredient').textContent
         };
 
+        const flags=window.MedicineSafety.screen([...medications,newMed],activeDiseases);
+        if(flags.length && !document.getElementById('medicine-review-ack')?.checked){
+            showMedicineReview(flags,true);
+            document.getElementById('medicine-review-ack').focus();
+            return;
+        }
         medications.push(newMed);
+        document.getElementById('medicine-form-review')?.remove();
 
         // Auto-check target disease if present in profile
         const diseaseObj = activeDiseases.find(d => d.id === condition);
@@ -403,6 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveState();
 
         medForm.reset();
+        document.getElementById('medicine-practical-info')?.replaceChildren();
         apiBadge.style.display = 'none';
         generateTimes(2);
 
@@ -410,6 +424,17 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAllViews();
     });
 
+    function showMedicineReview(flags,form=false){
+        const id=form?'medicine-form-review':'medicine-safety-review';
+        let host=document.getElementById(id);
+        if(!host){host=document.createElement('section');host.id=id;host.className='medicine-review';
+            if(form)medForm.querySelector('button[type="submit"]').before(host);
+            else document.querySelector('#tab-schedule .panel-header').after(host);
+        }
+        const esc=window.MediCare.escape;
+        host.innerHTML='<h3>'+ (flags.length?'Consult a doctor or pharmacist':'Medicine review') +'</h3>'+flags.map(f=>'<article><h4>'+esc(f.title)+'</h4><p>'+esc(f.message)+'</p><a class="source-link" target="_blank" rel="noopener noreferrer" href="'+esc(f.url)+'">Source: '+esc(new URL(f.url).hostname)+'</a></article>').join('')+'<p class="review-note">Limited checks across ALL saved medicines and health topics, including hidden ones. Allergies, age, pregnancy, doses, kidney function and many interactions are not assessed. No flags does not mean a combination is safe or free of side effects.</p>'+(form?'<label class="review-ack"><input id="medicine-review-ack" type="checkbox"> I understand this needs professional review. Save only as a record, not as approval to take it.</label>':'');
+    }
+    medForm.addEventListener('input',()=>{const ack=document.getElementById('medicine-review-ack');if(ack)ack.checked=false;});
     function saveState() {
         localStorage.setItem('medicare_medications_v9', JSON.stringify(medications));
         localStorage.setItem('medicare_dose_logs', JSON.stringify(doseLogs));
@@ -418,6 +443,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateAllViews() {
         renderSchedule();
+        if(medications.length)showMedicineReview(window.MedicineSafety.screen(medications,activeDiseases));
+        else document.getElementById('medicine-safety-review')?.remove();
         renderExercises();
         renderRemedies();
         renderCareGuidelines();
@@ -441,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Filter medications by currently checked diseases
         const activeMeds = medications.filter(med => {
-            return med.condition === 'general' || checkedDiseaseIds.length === 0 || checkedDiseaseIds.includes(med.condition);
+            return med.condition === 'general' || checkedDiseaseIds.includes(med.condition);
         });
 
         let scheduleItems = [];
@@ -473,9 +500,9 @@ document.addEventListener('DOMContentLoaded', () => {
             timelineContainer.innerHTML = `
                 <div class="card onboarding-welcome-card" style="text-align: center; padding: 40px; background: var(--primary-light); border: 1px solid var(--primary-border);">
                     <i class="fa-solid fa-hand-holding-medical" style="font-size: 3.5rem; color: var(--primary-color); margin-bottom: 16px;"></i>
-                    <h3 style="color: var(--primary-color);">No medicines scheduled yet</h3>
+                    <h3 style="color: var(--primary-color);">No medicines for the selected topics</h3>
                     <p class="text-muted" style="max-width: 600px; margin: 8px auto 20px;">
-                        Add medicines from your own prescription to create your schedule. Browse the health library for everyday care and movement guidance.
+                        Select a saved health topic to see its medicines, or add a medicine from your own prescription. Unchecked topics stay saved but are hidden from this schedule.
                     </p>
                     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                         <button onclick="document.querySelector('[data-tab=\\'tab-add\\']').click()" class="btn btn-primary"><i class="fa-solid fa-plus-circle"></i> Add Your Medication</button>
@@ -508,8 +535,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="dosage-pill">${window.MediCare.escape(item.med.dosage)}</span>
                         ${statusBadge}
                     </h4>
+                    ${window.MedicineSafety.card(item.med)}
                     <div class="timeline-meta">
-                        <span><i class="fa-solid fa-glass-water"></i> ${formatFoodRelation(item.med.food)}</span>
+                        <span><i class="fa-solid fa-glass-water"></i> ${window.MedicineSafety.info(item.med).length ? 'Meal instructions below' : 'Recorded meal instruction: '+formatFoodRelation(item.med.food)}</span>
                         <span><i class="fa-solid fa-stethoscope"></i> ${window.MediCare.escape(formatConditionName(item.med.condition))}</span>
                     </div>
                     ${item.med.notes ? `<p style="font-size:0.85rem; color: var(--text-muted); margin-top:4px;"><i class="fa-solid fa-sticky-note"></i> ${window.MediCare.escape(item.med.notes)}</p>` : ''}

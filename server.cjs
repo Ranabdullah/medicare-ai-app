@@ -3,11 +3,16 @@ const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const root = __dirname;
-const allowed = new Set(['index.html','app.js','health-library.js','workspace.js','styles.css','workspace.css']);
+const {readSource}=require('./source-reader.cjs');
+const allowed = new Set(['index.html','app.js','health-library.js','workspace.js','styles.css','workspace.css','medicine-safety.js']);
 http.createServer(async (req,res) => {
   const reply=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
   try {
     const url=new URL(req.url,'http://localhost');
+    if(url.pathname==='/api/source') {
+      if(req.method!=='GET')return reply(405,{error:'Method not allowed'});
+      try {return reply(200,await readSource(url.searchParams.get('url')));} catch {return reply(502,{error:'Source text could not be loaded'});}
+    }
     if(url.pathname==='/api/health') {
       if(req.method!=='POST')return reply(405,{error:'Method not allowed'});
       if(req.headers.origin && new URL(req.headers.origin).host!==req.headers.host)return reply(403,{error:'Origin not allowed'});

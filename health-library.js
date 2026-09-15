@@ -22,16 +22,53 @@
   const sources = topic => (topic.sources || []).filter(s => safeUrl(s.url)).map(s => `<a class="source-link" href="${escape(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">↗ ${escape(s.title)}</a>`).join('');
   const fallback = topic => ({...topic,kind:'Directory topic',overview:'Found in the NLM medical conditions directory. Open the linked patient information for details.',medicine:'No medication summary has been reviewed for this topic. Use the linked source and discuss treatment with a clinician.',exercise:'No condition-specific exercise recommendation is available here. Consult the source and your care team.',care:'Open the patient information below for condition-specific care.',safety:'This directory entry confirms a medical term, not a personal diagnosis.',sources: topic.sources?.length ? topic.sources : [{title:'NLM medical conditions directory',url:'https://clinicaltables.nlm.nih.gov/apidoc/conditions/v3/doc.html'}]});
   const find = topic => topics.find(t => t.id === topic.id) || fallback(topic);
+  const medicineOptions = [
+    {name:'Paracetamol (acetaminophen)',topics:['headache'],access:'Common non-prescription pain relief',use:'Used for pain and fever. Check the product label and avoid taking more than one product containing paracetamol.',url:'https://www.nhs.uk/medicines/paracetamol-for-adults/'},
+    {name:'Ibuprofen / other NSAIDs',topics:['headache','back_pain','joint_arthritis'],access:'Some products are available without prescription',use:'Used for pain and inflammation. May cause stomach bleeding or kidney problems and may be unsuitable with certain conditions or medicines. Ask a pharmacist about suitability.',url:'https://www.nhs.uk/medicines/nsaids/'},
+    {name:'Metformin',topics:['diabetes'],access:'Prescription treatment',use:'Used for type 2 diabetes. It may be part of a combination chosen by your clinician; it is not a treatment for every type of diabetes.',url:'https://www.nhs.uk/medicines/metformin/'},
+    {name:'Antacids and alginates',topics:['acid_reflux'],access:'Common pharmacy options',use:'May relieve heartburn symptoms. Persistent symptoms need assessment; other acid-reducing treatments may be considered by a clinician.',url:'https://www.nhs.uk/conditions/heartburn-and-acid-reflux/'},
+    {name:'Prescribed inhalers',topics:['asthma'],access:'Clinician-selected treatment',use:'The preventer and reliever inhaler plan must match your asthma assessment and action plan. Inhalers are not interchangeable.',url:'https://www.nhs.uk/conditions/asthma/'},
+    {name:'Antibiotics when indicated',topics:['pneumonia'],access:'Prescription treatment',use:'A clinician decides whether antibiotics are needed and which antibiotic, dose and duration are appropriate. Do not reuse an old pneumonia prescription.',url:'https://www.nhs.uk/conditions/pneumonia/'},
+    {name:'Iron replacement',topics:['anemia'],access:'Professional assessment needed',use:'Iron tablets may be prescribed after iron deficiency is confirmed and its cause investigated. Not all anaemia is caused by low iron.',url:'https://www.nhs.uk/conditions/iron-deficiency-anaemia/'}
+  ];
+  function optionsFor(t){
+    const items=medicineOptions.filter(m=>m.topics.includes(t.id));
+    return items.length?'<div class="medicine-options"><h4>Common options to discuss</h4>'+items.map(m=>'<article class="medicine-option"><h4>'+escape(m.name)+'</h4><span class="topic-kind">'+escape(m.access)+'</span><p>'+escape(m.use)+'</p><a class="source-link" href="'+escape(m.url)+'" target="_blank" rel="noopener noreferrer">Source: NHS medicine information</a></article>').join('')+'<p class="review-note">Examples, not a prescription or a complete list. Product strength and local availability vary; confirm with an Irish pharmacist. No dose or medicine is added automatically.</p></div>':'';
+  }
+  function sourcePanel(t, category) {
+    const urls=(t.sources||[]).filter(s=>{try{return ['www.nhs.uk','www2.hse.ie','medlineplus.gov','www.medlineplus.gov','www.nlm.nih.gov'].includes(new URL(s.url).hostname);}catch{return false;}});
+    return urls.length ? '<section class="source-reading" data-source-url="'+escape(urls[0].url)+'" data-category="'+escape(category)+'"><p class="source-loading" role="status">Loading patient information from the source…</p></section>' : '';
+  }
+  const sourceRequests=new Map();
+  async function loadSource(url){
+    if(!sourceRequests.has(url))sourceRequests.set(url,fetch('/api/source?url='+encodeURIComponent(url),{signal:AbortSignal.timeout(30000)}).then(r=>{if(!r.ok)throw new Error('source');return r.json();}).catch(e=>{sourceRequests.delete(url);throw e;}));
+    return sourceRequests.get(url);
+  }
+  async function populateSource(el){
+    if(el.dataset.loading)return;el.dataset.loading='true';
+    try{
+      const data=await loadSource(el.dataset.sourceUrl);if(!el.isConnected)return;
+      const patterns={exercise:/exercis|physical|activ|lifestyle|recover|self.care/i,medicine:/medicin|treat|inhal|antibiotic/i,care:/self|lifestyle|help|diet|eat|manag|treat/i,safety:/urgent|emergency|help|complication|GP|999|111/i,overview:/overview|symptom|about|what|treat/i};
+      const relevant=data.sections.filter(s=>(patterns[el.dataset.category]||patterns.overview).test(s.heading));
+      const chosen=(relevant.length?relevant:data.sections).slice(0,3);
+      const render=s=>'<div class="source-section"><h4>'+escape(s.heading)+'</h4><ul>'+s.paragraphs.map(p=>'<li>'+escape(p)+'</li>').join('')+'</ul></div>';
+      el.innerHTML='<div class="source-reading-title">From '+escape(new URL(data.url).hostname)+' · Patient information excerpts</div><p class="review-note">UK source: NHS 111 refers to UK services. In Ireland, contact your GP; call 112 or 999 for an emergency.</p>'+(!relevant.length?'<p class="review-note">The source has no separate section for this category. General condition information is shown below.</p>':'')+chosen.map(render).join('')+'<details><summary>Read more from this source</summary>'+data.sections.filter(s=>!chosen.includes(s)).map(render).join('')+'</details><p class="review-note">Retrieved '+new Date(data.retrievedAt).toLocaleDateString()+'. Excerpts may be shortened; source links provide full context. NHS service numbers refer to the UK; in Ireland call 112 or 999 for emergencies.</p>';
+    }catch{if(!el.isConnected)return;el.innerHTML='<p>Could not load the source text. The summary above is still available.</p><button class="btn btn-outline source-retry">Retry source</button>';el.querySelector('button').onclick=()=>{delete el.dataset.loading;populateSource(el);};}
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    const scan=()=>document.querySelectorAll('.source-reading:not([data-loading])').forEach(el=>populateSource(el));
+    new MutationObserver(scan).observe(document.getElementById('main-content'),{childList:true,subtree:true});scan();
+  });
   function renderCollection(type, profile) {
     const ids = {exercise:'exercise-grid',care:'remedies-grid',safety:'dynamic-care-body'};
     const host = document.getElementById(ids[type]); if (!host) return;
     const selected = profile.filter(d => d.checked).map(find);
-    host.innerHTML = selected.length ? selected.map(t => `<article class="health-card"><span class="topic-kind">${escape(t.kind)}</span><h3>${escape(t.label)}</h3><p>${escape(t[type])}</p>${sources(t)}</article>`).join('') : '<div class="library-empty"><span>✧</span><h3>Care that fits your day</h3><p>Select a health topic in the sidebar to see relevant guidance here.</p></div>';
+    host.innerHTML = selected.length ? selected.map(t => `<article class="health-card"><span class="topic-kind">${escape(t.kind)}</span><h3>${escape(t.label)}</h3><p>${escape(t[type])}</p>${sources(t)}${sourcePanel(t,type)}</article>`).join('') : '<div class="library-empty"><span>✧</span><h3>Care that fits your day</h3><p>Select a health topic in the sidebar to see relevant guidance here.</p></div>';
     if(type === 'safety') document.getElementById('dynamic-warning-body').innerHTML = '<p>For a life-threatening emergency in Ireland, call <strong>112 or 999</strong>.</p><a class="source-link" href="https://www2.hse.ie/emergencies/when-to-call-112-or-999/" target="_blank" rel="noopener noreferrer">↗ HSE: emergency help</a>';
   }
   function detail(topic) {
     const t=find(topic);
-    document.getElementById('condition-detail').innerHTML = `<div class="detail-heading"><div><span class="topic-kind">HEALTH LIBRARY · ${escape(t.kind)}</span><h2>${escape(t.label)}</h2><p>${escape(t.overview)}</p></div><button class="btn btn-primary" id="save-topic">+ Add to my topics</button></div><div class="detail-grid">${[['medicine','Medication & active ingredients','fa-pills'],['exercise','Movement & exercise','fa-person-walking'],['care','Everyday care','fa-leaf'],['safety','When to get help','fa-shield-heart']].map(([key,title,icon]) => `<article class="health-card"><div class="card-symbol"><i class="fa-solid ${icon}"></i></div><h3>${title}</h3><p>${escape(t[key])}</p>${sources(t)}</article>`).join('')}</div><p class="clinical-note">General information, not a diagnosis or prescription. Dose and formulation depend on the person and product. Use your clinician’s instructions for your schedule.</p><p class="review-note">${t.kind==='Directory topic'?'Retrieved from NLM': 'Curated source summaries checked 15 September 2026'}. Sources open in a new tab.</p>`;
+    document.getElementById('condition-detail').innerHTML = `<div class="detail-heading"><div><span class="topic-kind">HEALTH LIBRARY · ${escape(t.kind)}</span><h2>${escape(t.label)}</h2><p>${escape(t.overview)}</p></div><button class="btn btn-primary" id="save-topic">+ Add to my topics</button></div><div class="detail-grid">${[['medicine','Medication & active ingredients','fa-pills'],['exercise','Movement & exercise','fa-person-walking'],['care','Everyday care','fa-leaf'],['safety','When to get help','fa-shield-heart']].map(([key,title,icon]) => `<article class="health-card"><div class="card-symbol"><i class="fa-solid ${icon}"></i></div><h3>${title}</h3><p>${escape(t[key])}</p>${key==='medicine'?optionsFor(t):''}${sources(t)}${sourcePanel(t,key)}</article>`).join('')}</div><p class="clinical-note">General information, not a diagnosis or prescription. Dose and formulation depend on the person and product. Use your clinician’s instructions for your schedule.</p><p class="review-note">${t.kind==='Directory topic'?'Retrieved from NLM': 'Curated source summaries checked 15 September 2026'}. Sources open in a new tab.</p>`;
     const btn=document.getElementById('save-topic');
     if(window.medicareProfile?.list().some(d=>d.id===t.id && d.checked)){btn.textContent='✓ Added to my topics';btn.disabled=true;}
     btn.onclick=()=>{window.medicareProfile.add(t);btn.textContent='✓ Added to my topics';btn.disabled=true;};
@@ -41,7 +78,7 @@
   function automaticSummary(selected, message='') {
     const host=document.getElementById('ai-output-box');
     const chosen=selected.map(find);
-    host.innerHTML=(message ? '<p class="clinical-note">'+escape(message)+'</p>' : '') + (chosen.length ? '<p class="review-note">Source-based topic summaries · Not an AI-generated diagnosis.</p>'+chosen.map(t=>'<article class="health-card"><h3>'+escape(t.label)+'</h3><p>'+escape(t.overview)+'</p>'+['medicine','exercise','care','safety'].map(key=>'<p><strong>'+({medicine:'Medication',exercise:'Movement',care:'Everyday care',safety:'When to get help'}[key])+': </strong>'+escape(t[key])+'</p>').join('')+sources(t)+'</article>').join('') : '<div class="library-empty"><h3>Select a health topic to begin</h3><p>Your sourced summary will appear here automatically.</p></div>');
+    host.innerHTML=(message ? '<p class="clinical-note">'+escape(message)+'</p>' : '') + (chosen.length ? '<p class="review-note">Source-based topic summaries · Not an AI-generated diagnosis.</p>'+chosen.map(t=>'<article class="health-card"><h3>'+escape(t.label)+'</h3><p>'+escape(t.overview)+'</p>'+['medicine','exercise','care','safety'].map(key=>'<p><strong>'+({medicine:'Medication',exercise:'Movement',care:'Everyday care',safety:'When to get help'}[key])+': </strong>'+escape(t[key])+'</p>').join('')+sources(t)+sourcePanel(t,'overview')+'</article>').join('') : '<div class="library-empty"><h3>Select a health topic to begin</h3><p>Your sourced summary will appear here automatically.</p></div>');
   }
   function refresh(selected) {requestId++;automaticSummary(selected);}
   async function ask(prompt, selected) {
