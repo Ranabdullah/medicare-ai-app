@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediCare - Multi-Disease Medication Schedule & Gemini AI Healthcare Companion</title>
+    <title>MediCare — Your everyday health companion</title>
     <meta name="description" content="Manage multi-disease medication schedules for Ireland (HPRA POM vs OTC). Powered by Gemini AI for personalized care plans, exercise guides, and verified PubMed research citations.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,18 +12,18 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="workspace.css">
+<link rel="icon" href="assets/medicare-logo.svg" type="image/svg+xml">
 </head>
 <body>
     <div class="app-container">
         <!-- Header / Brand Banner -->
         <header class="app-header">
             <div class="header-left">
-                <div class="logo-icon">
-                    <i class="fa-solid fa-heart-pulse"></i>
-                </div>
+                <button id="menu-toggle" class="btn btn-icon" aria-label="Open navigation" aria-expanded="false">☰</button><img class="brand-mark" src="assets/medicare-logo.svg" alt="" width="42" height="42">
                 <div>
-                    <h1>MediCare AI Companion (Ireland HPRA Edition)</h1>
-                    <p class="subtitle">Ireland Rx & OTC Classification • Multi-Disease Auto-Schedule • Gemini AI Doctor</p>
+                    <h1>MediCare</h1>
+                    <p class="subtitle">Your everyday health companion</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -46,12 +46,13 @@
             </div>
         </header>
 
-        <!-- MULTI-DISEASE PATIENT HEALTH PROFILE & CUSTOM DISEASE ADD/REMOVE -->
+        <aside class="sidebar" id="sidebar" aria-label="Health navigation"><div class="sidebar-caption">YOUR WORKSPACE</div>
+<!-- MULTI-DISEASE PATIENT HEALTH PROFILE & CUSTOM DISEASE ADD/REMOVE -->
         <section class="card profile-selector-card">
             <div class="profile-card-header">
                 <div>
-                    <h3><i class="fa-solid fa-user-doctor" style="color:var(--primary-color);"></i> Patient Health Profile — Select & Manage Your Diseases</h3>
-                    <p class="text-muted">Selecting or unselecting a disease automatically adjusts your medications, exercises, home remedies, and care guidelines!</p>
+                    <h3><i class="fa-solid fa-user-doctor" style="color:var(--primary-color);"></i> My health topics</h3>
+                    <p class="text-muted">Select topics to tailor your care tabs.</p>
                 </div>
                 <div class="profile-header-btns">
                     <button id="btn-select-all-diseases" class="btn btn-outline btn-sm">
@@ -83,34 +84,34 @@
             </button>
             <button class="nav-tab" data-tab="tab-ai-consultant">
                 <i class="fa-solid fa-robot"></i>
-                <span>Gemini AI Doctor</span>
+                <span>AI Doctor</span>
             </button>
             <button class="nav-tab" data-tab="tab-add">
                 <i class="fa-solid fa-pills"></i>
                 <span>Add Medication</span>
             </button>
             <button class="nav-tab" data-tab="tab-exercises">
-                <i class="fa-solid fa-person-walking-stretch"></i>
-                <span>Recommended Exercises</span>
+                <i class="fa-solid fa-person-walking"></i>
+                <span>Movement & exercise</span>
             </button>
             <button class="nav-tab" data-tab="tab-remedies">
                 <i class="fa-solid fa-leaf"></i>
-                <span>Home Remedies</span>
+                <span>Everyday care</span>
             </button>
             <button class="nav-tab" data-tab="tab-care">
                 <i class="fa-solid fa-shield-heart"></i>
                 <span>Care & Safety</span>
             </button>
-        </nav>
+        <button class="nav-tab" data-tab="tab-library"><i class="fa-solid fa-book-medical"></i><span>Health library</span></button></nav></aside><button class="sidebar-scrim" id="sidebar-scrim" aria-label="Close navigation" hidden></button>
 
         <!-- Main Content Area -->
-        <main class="app-content">
+        <main class="app-content" id="main-content"><div class="workspace-eyebrow">A LITTLE CARE, EVERY DAY <span>● Your personal workspace</span></div><section id="tab-library" class="tab-panel"><div id="condition-detail"></div></section>
 
             <!-- TAB 1: DAILY SCHEDULE & TRACKER -->
             <section id="tab-schedule" class="tab-panel active">
                 <div class="panel-header">
                     <div>
-                        <h2>Today's Medication Timeline</h2>
+                        <h2>Your daily schedule</h2>
                         <p class="text-muted" id="current-date-str">Loading date...</p>
                     </div>
                     <div class="schedule-summary-cards">
@@ -199,7 +200,7 @@
                 <div class="card form-card">
                     <div class="card-header">
                         <h2><i class="fa-solid fa-prescription-bottle-medical"></i> Add New Medication</h2>
-                        <p class="text-muted">Type any medication name. Auto-searches live NIH RxNav API & Irish pharmacy classification (POM vs OTC).</p>
+                        <p class="text-muted">Type any medication name. Searches the NLM RxNorm medicine directory. Confirm Irish availability and your dose with a pharmacist.</p>
                     </div>
 
                     <form id="medication-form">
@@ -258,7 +259,7 @@
                             <!-- Ireland Availability Status -->
                             <div class="form-group">
                                 <label for="med-ireland-type"><i class="fa-solid fa-flag"></i> Ireland Availability Status</label>
-                                <select id="med-ireland-type" required>
+                                <select id="med-ireland-type" required><option value="unknown">Not verified — check with your pharmacist</option>
                                     <option value="POM">Prescription Only (POM - Doctor Required in Ireland)</option>
                                     <option value="OTC">Over-The-Counter (OTC Pharmacy - Buy Locally in Ireland)</option>
                                 </select>
@@ -395,6 +396,6 @@
         <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
     </audio>
 
-    <script src="app.js"></script>
+    <script src="health-library.js"></script><script src="app.js"></script><script src="workspace.js"></script>
 </body>
 </html>
