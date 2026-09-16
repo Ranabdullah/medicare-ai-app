@@ -1,0 +1,15 @@
+# Dependencies and local development files are never public site assets.
+node_modules/
+.git/
+.env*
+
+# Server-side, project-management, and deployment files are not part of the static site.
+server.cjs
+source-reader.cjs
+package.json
+package-lock.json
+README.md
+wrangler.toml
+wrangler.jsonc
+.gitignore
+.assetsignore
