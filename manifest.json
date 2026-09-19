@@ -1,0 +1,16 @@
+{
+  "name": "MediCare - Schedule & Safety",
+  "short_name": "MediCare",
+  "description": "Smart medication schedule, interaction alerts, and verified health guidance",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "icons": [
+    {
+      "src": "assets/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
